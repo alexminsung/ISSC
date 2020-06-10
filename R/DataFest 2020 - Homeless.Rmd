@@ -8,3 +8,33 @@ knitr::opts_chunk$set(echo = FALSE)
 ```
 
 
+```{r message = FALSE, echo = FALSE}
+library(shiny)
+library(shinydashboard)
+library(tidyverse)
+
+#Reading the csv
+shelterData <- read.csv("https://raw.githubusercontent.com/alexminsung/ISSC/master/data/Daily%20shelter%20occpancy%20current.csv?token=APUVSRCQBS7QDHDGTMGCLMS65JGQU")
+attach(shelterData)
+
+shelterData %>% 
+  distinct(SHELTER_NAME)
+
+# Finds all rows that starts witih "HFS"
+HFS <- grep("^HFS", as.character(shelterData$SHELTER_NAME), value = TRUE)
+
+# List of shelters with COVID19 cases
+target <- c("COSTI Reception Centre", "Seaton House", HFS, "Salvation Army - Maxwell Meighen", 
+            "SVDP - Mary's Home", "Robertson House")
+
+# Filters the data by reported Covid19 cases
+shelterByCovid <- shelterData %>%
+  filter(as.character(SHELTER_NAME) %in% target )
+
+
+
+```
+
+
+
+
