@@ -38,6 +38,7 @@ shelterByCutoff <- shelterData %>%
 
 
 
+
 ```
 
 Qs: The effects of covid19 on homeless shelters/homeless?
@@ -58,6 +59,27 @@ shelterData %>%
   ggplot(aes(x = OCCUPANCY_DATE, y = OCCUPANCY)) + facet_wrap(~SHELTER_NAME)
 ```
 
+Qs: The effects of covid19 on homeless shelters/homeless?
+- but how does an increase in occupancy in shelter a impact the society (societal impact)?
+- the numbers are obviously going to increase because non-essential travels are restricted and homeless are more likely to be in shelters
+- there are possible health impacts...
+
+1. try to sort the data to include 14 days period before the reported case
+2. (if possible) compare it to the reported case around the region at the time of the reported case (or couple days after)
+  - want to see if these shelters acted as a hotspot
+
+```{r echo = FALSE}
+shelterData %>%
+  #filter(as.character(OCCUPANCY_DATE) > "2020-03-001T00:00:00") %>%
+  ggplot(aes(x = OCCUPANCY_DATE, y = OCCUPANCY, color = SHELTER_NAME)) + geom_point()
+
+
+shelterData %>%
+  filter(as.character(SECTOR) == "Co-ed" & as.character(OCCUPANCY_DATE) > "2020-03-001T00:00:00") %>%
+  ggplot(aes(x = OCCUPANCY_DATE, y = OCCUPANCY, color = SHELTER_NAME)) + facet_wrap(SHELTER_CITY~ORGANIZATION_NAME) + geom_point()
+  #+ geom_vline(aes(xintercept=""), color="black", linetype="dashed")
+
+```
 
 
 
