@@ -11,6 +11,7 @@ knitr::opts_chunk$set(echo = FALSE)
 library(shiny)
 library(shinydashboard)
 library(tidyverse)
+library(ggplot2)
 
 #Reading the csv
 shelterData <- read.csv("https://raw.githubusercontent.com/alexminsung/ISSC/master/data/Daily%20shelter%20occpancy%20current.csv?token=APUVSRCQBS7QDHDGTMGCLMS65JGQU")
@@ -31,8 +32,26 @@ shelterByCovid <- shelterData %>%
   filter(as.character(SHELTER_NAME) %in% target )
 
 
+shelterByCutoff <- shelterData %>%
+  filter(as.character(OCCUPANCY) > 150 && )
+
+
 
 ```
 
+Qs: The effects of covid19 on homeless shelters/homeless?
+- but how does an increase in occupancy in shelter a impact the society (societal impact)?
+- the numbers are obviously going to increase because non-essential travels are restricted and homeless are more likely to be in shelters
+- there are possible health impacts...
+
+1. try to sort the data to include 14 days period before the reported case
+2. (if possible) compare it to the reported case around the region at the time of the reported case (or couple days after)
+  - want to see if these shelters acted as a hotspot
+
+```{r echo = FALSE}
+shelterData %>%
+  filter(as.character(OCCUPANCY_DATE) > "2020-03-001T00:00:00") %>%
+  ggplot(aes(x = OCCUPANCY_DATE, y = OCCUPANCY, color = SHELTER_NAME)) + geom_point()
+```
 
 
