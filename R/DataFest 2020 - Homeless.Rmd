@@ -53,6 +53,14 @@ Qs: The effects of covid19 on homeless shelters/homeless?
 shelterData %>%
   #filter(as.character(OCCUPANCY_DATE) > "2020-03-001T00:00:00") %>%
   ggplot(aes(x = OCCUPANCY_DATE, y = OCCUPANCY, color = SHELTER_NAME)) + geom_point()
+<<<<<<< Updated upstream
+=======
+
+shelterData %>%
+  filter(as.character(SECTOR) == "Co-ed" & as.character(OCCUPANCY_DATE) > "2020-03-001T00:00:00") %>%
+  ggplot(aes(x = OCCUPANCY_DATE, y = OCCUPANCY, color = SHELTER_NAME)) + facet_wrap(SHELTER_CITY~ORGANIZATION_NAME) + geom_point()
+  #+ geom_vline(aes(xintercept=""), color="black", linetype="dashed")
+>>>>>>> Stashed changes
 ```
 
 
