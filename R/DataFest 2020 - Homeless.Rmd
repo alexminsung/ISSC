@@ -7,6 +7,7 @@ output: slidy_presentation
 knitr::opts_chunk$set(echo = FALSE)
 ```
 
+
 ```{r message = FALSE, echo = FALSE}
 library(shiny)
 library(shinydashboard)
@@ -53,5 +54,6 @@ shelterData %>%
   #filter(as.character(OCCUPANCY_DATE) > "2020-03-001T00:00:00") %>%
   ggplot(aes(x = OCCUPANCY_DATE, y = OCCUPANCY, color = SHELTER_NAME)) + geom_point()
 ```
+
 
 
