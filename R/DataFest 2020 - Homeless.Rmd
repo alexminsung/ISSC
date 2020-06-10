@@ -33,7 +33,7 @@ shelterByCovid <- shelterData %>%
 
 
 shelterByCutoff <- shelterData %>%
-  filter(as.character(OCCUPANCY) > 150 && )
+  filter(as.character(OCCUPANCY) > 150 && as.character(OCCUPANCY_DATE) == "2020-03-001T00:00:00" )
 
 
 
@@ -50,7 +50,7 @@ Qs: The effects of covid19 on homeless shelters/homeless?
 
 ```{r echo = FALSE}
 shelterData %>%
-  filter(as.character(OCCUPANCY_DATE) > "2020-03-001T00:00:00") %>%
+  #filter(as.character(OCCUPANCY_DATE) > "2020-03-001T00:00:00") %>%
   ggplot(aes(x = OCCUPANCY_DATE, y = OCCUPANCY, color = SHELTER_NAME)) + geom_point()
 ```
 
