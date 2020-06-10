@@ -30,12 +30,8 @@ target <- c("COSTI Reception Centre", "Seaton House", HFS, "Salvation Army - Max
 
 # Filters the data by reported Covid19 cases
 shelterByCovid <- shelterData %>%
-  filter(as.character(SHELTER_NAME) %in% target )
-
-
-shelterByCutoff <- shelterData %>%
-  filter(as.character(OCCUPANCY) > 150 && as.character(OCCUPANCY_DATE) == "2020-03-001T00:00:00" )
-
+  filter(as.character(SHELTER_NAME) %in% target)
+  
 
 
 
@@ -50,43 +46,46 @@ Qs: The effects of covid19 on homeless shelters/homeless?
 2. (if possible) compare it to the reported case around the region at the time of the reported case (or couple days after)
   - want to see if these shelters acted as a hotspot
 
-```{r echo = FALSE}
-shelterData %>%
-  #filter(as.character(OCCUPANCY_DATE) > "2020-03-001T00:00:00") %>%
-  ggplot(aes(x = OCCUPANCY_DATE, y = OCCUPANCY, color = SHELTER_NAME)) + geom_point()
-
-shelterData %>%
-  ggplot(aes(x = OCCUPANCY_DATE, y = OCCUPANCY)) + facet_wrap(~SHELTER_NAME)
-```
-
-Qs: The effects of covid19 on homeless shelters/homeless?
-- but how does an increase in occupancy in shelter a impact the society (societal impact)?
-- the numbers are obviously going to increase because non-essential travels are restricted and homeless are more likely to be in shelters
-- there are possible health impacts...
-
-1. try to sort the data to include 14 days period before the reported case
-2. (if possible) compare it to the reported case around the region at the time of the reported case (or couple days after)
-  - want to see if these shelters acted as a hotspot
 
 ```{r echo = FALSE}
+#I have separated the data by sector as you suggested but even then the points are very messy. If you can think of a way to 
+# improve this, then go ahead
 
 shelterData %>%
-  #filter(as.character(OCCUPANCY_DATE) > "2020-03-001T00:00:00") %>%
-  ggplot(aes(x = OCCUPANCY_DATE, y = OCCUPANCY, color = SHELTER_NAME)) + geom_point()
-
-shelterData %>%
-  filter(as.character(SECTOR) == "Co-ed" & as.character(OCCUPANCY_DATE) > "2020-03-001T00:00:00") %>%
+  filter(as.character(SECTOR) == "Co-ed" & as.character(OCCUPANCY_DATE) > "2020-03-01T00:00:00") %>%
   ggplot(aes(x = OCCUPANCY_DATE, y = OCCUPANCY, color = SHELTER_NAME)) + facet_wrap(SHELTER_CITY~ORGANIZATION_NAME) + geom_point()
 
+shelterData %>%
+  filter(as.character(SECTOR) == "Families" & as.character(OCCUPANCY_DATE) > "2020-03-01T00:00:00") %>%
+  ggplot(aes(x = OCCUPANCY_DATE, y = OCCUPANCY, color = SHELTER_NAME)) + facet_wrap(SHELTER_CITY~ORGANIZATION_NAME) + geom_point() + theme(axis.text.x = element_text(angle=90, hjust=0))
+
+shelterData %>%
+  filter(as.character(SECTOR) == "Women" & as.character(OCCUPANCY_DATE) > "2020-03-01T00:00:00") %>%
+  ggplot(aes(x = OCCUPANCY_DATE, y = OCCUPANCY, color = SHELTER_NAME)) + facet_wrap(SHELTER_CITY~ORGANIZATION_NAME) + geom_point() + theme(axis.text.x = element_text(angle=90, hjust=0))
+
+shelterData %>%
+  filter(as.character(SECTOR) == "Men" & as.character(OCCUPANCY_DATE) > "2020-03-01T00:00:00") %>%
+  ggplot(aes(x = OCCUPANCY_DATE, y = OCCUPANCY, color = SHELTER_NAME)) + facet_wrap(SHELTER_CITY~ORGANIZATION_NAME) + geom_point() + theme(axis.text.x = element_text(angle=90, hjust=0))
+
+shelterData %>%
+  filter(as.character(SECTOR) == "Men" & as.character(OCCUPANCY_DATE) > "2020-03-01T00:00:00") %>%
+  ggplot(aes(x = OCCUPANCY_DATE, y = OCCUPANCY, color = SHELTER_NAME)) + facet_wrap(SHELTER_CITY~ORGANIZATION_NAME) + geom_point() + theme(axis.text.x = element_text(angle=90, hjust=0))
+
+shelterData %>%
+  filter(as.character(SECTOR) == "Youth" & as.character(OCCUPANCY_DATE) > "2020-03-01T00:00:00") %>%
+  ggplot(aes(x = OCCUPANCY_DATE, y = OCCUPANCY, color = SHELTER_NAME)) + facet_wrap(SHELTER_CITY~ORGANIZATION_NAME) + geom_point() + theme(axis.text.x = element_text(angle=90, hjust=0))
   
 ```
 
 ```{r echo = FALSE}
+# this is on the side, since i wanted to see if the numbers dropped after a covid19 case was reported on some of these shelters
 shelterByCovid %>%
-  filter(as.character(OCCUPANCY_DATE) > "2020-03-001T00:00:00") %>%
+  filter(as.character(OCCUPANCY_DATE) > "2020-03-01T00:00:00" & as.character(ORGANIZATION_NAME) == "Homes First Society") %>%
   mutate(log_occupancy = log(OCCUPANCY)) %>%
-  ggplot(aes(x = OCCUPANCY_DATE, y = log_occupancy, color = ORGANIZATION_NAME)) + geom_point() + 
-  facet_wrap(~ORGANIZATION_NAME) + geom_vline(aes(xintercept=""), color="black", linetype="dashed")
+  ggplot(aes(x = OCCUPANCY_DATE, y = OCCUPANCY, color = SHELTER_NAME)) + geom_point() + 
+  facet_wrap(~ORGANIZATION_NAME) +
+  geom_vline(aes(xintercept = as.character(OCCUPANCY_DATE) == "2020-05-22T00:00:00"), color="black", linetype="dashed") + 
+  theme(axis.text.x = element_text(angle=90, hjust=0))
 
 ```
 
