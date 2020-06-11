@@ -53,29 +53,21 @@ Qs: The effects of covid19 on homeless shelters/homeless?
 
 # from this we can see that men and women make up most of the data (maybe we can exclude the rest?)
 shelterData %>%
-  filter(as.character(SECTOR) == "Co-ed") %>%
-  summarise(n())
-shelterData %>%
-  filter(as.character(SECTOR) == "Families") %>%
-  summarise(n())
-shelterData %>%
   filter(as.character(SECTOR) == "Men") %>%
   summarise(n())
 shelterData %>%
   filter(as.character(SECTOR) == "Women") %>%
   summarise(n())
-shelterData %>%
-  filter(as.character(SECTOR) == "Youth") %>%
-  summarise(n())
 
-shelterData %>%
-  filter(as.character(SECTOR) == "Co-ed" & as.character(OCCUPANCY_DATE) > "2020-03-01T00:00:00") %>%
-  ggplot(aes(x = OCCUPANCY_DATE, y = OCCUPANCY, color = SHELTER_NAME)) + facet_wrap(SHELTER_CITY~ORGANIZATION_NAME) +
-  geom_point() + theme(axis.text.x=element_blank(), axis.ticks.x=element_blank())
 
-shelterData %>%
-  filter(as.character(SECTOR) == "Families" & as.character(OCCUPANCY_DATE) > "2020-03-01T00:00:00") %>%
-  ggplot(aes(x = OCCUPANCY_DATE, y = OCCUPANCY, color = SHELTER_NAME)) + facet_wrap(SHELTER_CITY~ORGANIZATION_NAME) +     geom_point() + theme(axis.text.x=element_blank(), axis.ticks.x=element_blank())
+# shelterData %>%
+#   filter(as.character(SECTOR) == "Co-ed" & as.character(OCCUPANCY_DATE) > "2020-03-01T00:00:00") %>%
+#   ggplot(aes(x = OCCUPANCY_DATE, y = OCCUPANCY, color = SHELTER_NAME)) + facet_wrap(SHELTER_CITY~ORGANIZATION_NAME) +
+#   geom_point() + theme(axis.text.x=element_blank(), axis.ticks.x=element_blank())
+# 
+# shelterData %>%
+#   filter(as.character(SECTOR) == "Families" & as.character(OCCUPANCY_DATE) > "2020-03-01T00:00:00") %>%
+#   ggplot(aes(x = OCCUPANCY_DATE, y = OCCUPANCY, color = SHELTER_NAME)) + facet_wrap(SHELTER_CITY~ORGANIZATION_NAME) +     geom_point() + theme(axis.text.x=element_blank(), axis.ticks.x=element_blank())
 
 
 shelterData %>%
@@ -88,9 +80,9 @@ shelterData %>%
   ggplot(aes(x = OCCUPANCY_DATE, y = OCCUPANCY, color = SHELTER_NAME)) + facet_wrap(SHELTER_CITY~ORGANIZATION_NAME) +   geom_point() + theme(axis.text.x=element_blank(), axis.ticks.x=element_blank())
 
 
-shelterData %>%
-  filter(as.character(SECTOR) == "Youth" & as.character(OCCUPANCY_DATE) > "2020-03-01T00:00:00") %>%
-  ggplot(aes(x = OCCUPANCY_DATE, y = OCCUPANCY, color = SHELTER_NAME)) + facet_wrap(SHELTER_CITY~ORGANIZATION_NAME) +   geom_point() + theme(axis.text.x=element_blank(), axis.ticks.x=element_blank())
+# shelterData %>%
+#   filter(as.character(SECTOR) == "Youth" & as.character(OCCUPANCY_DATE) > "2020-03-01T00:00:00") %>%
+#   ggplot(aes(x = OCCUPANCY_DATE, y = OCCUPANCY, color = SHELTER_NAME)) + facet_wrap(SHELTER_CITY~ORGANIZATION_NAME) +   geom_point() + theme(axis.text.x=element_blank(), axis.ticks.x=element_blank())
 
   
 ```
@@ -98,12 +90,13 @@ shelterData %>%
 ```{r echo = FALSE}
 # this is on the side, since i wanted to see if the numbers dropped after a covid19 case was reported on some of these shelters
 shelterByCovid %>%
-  filter(as.character(OCCUPANCY_DATE) > "2020-03-01T00:00:00" & as.character(ORGANIZATION_NAME) == "Homes First Society") %>%
+  filter(as.character(OCCUPANCY_DATE) > "2020-03-01T00:00:00" & as.character(ORGANIZATION_NAME) == "Homes First Society"
+         & as.character(SECTOR) == "Men") %>%
   mutate(log_occupancy = log(OCCUPANCY)) %>%
-  ggplot(aes(x = OCCUPANCY_DATE, y = OCCUPANCY, color = SHELTER_NAME)) + geom_point() + 
+  ggplot(aes(x = OCCUPANCY_DATE, y = log_occupancy, color = SHELTER_NAME)) + geom_point() + 
   facet_wrap(~ORGANIZATION_NAME) +
-  geom_vline(aes(xintercept = as.character(OCCUPANCY_DATE) == "2020-05-22T00:00:00"), color="black", linetype="dashed") + 
-  theme(axis.text.x = element_text(angle=90, hjust=0))
+  geom_vline(aes(xintercept = which(levels(OCCUPANCY_DATE) %in% '2020-05-22T00:00:00')), color="black", linetype="dashed") + 
+  theme(axis.text.x=element_blank(), axis.ticks.x=element_blank())#theme(axis.text.x = element_text(angle=90, hjust=0))
 
 ```
 
