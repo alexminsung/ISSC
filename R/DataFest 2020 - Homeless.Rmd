@@ -91,12 +91,13 @@ shelterData %>%
 # this is on the side, since i wanted to see if the numbers dropped after a covid19 case was reported on some of these shelters
 shelterByCovid %>%
   filter(as.character(OCCUPANCY_DATE) > "2020-03-01T00:00:00" & as.character(ORGANIZATION_NAME) == "Homes First Society"
-         & as.character(SECTOR) == "Men") %>%
+         & as.character(SECTOR) == "Women") %>%
   mutate(log_occupancy = log(OCCUPANCY)) %>%
-  ggplot(aes(x = OCCUPANCY_DATE, y = log_occupancy, color = SHELTER_NAME)) + geom_point() + 
+  ggplot(aes(x = OCCUPANCY_DATE, y = OCCUPANCY, color = SHELTER_NAME)) + geom_point() + 
   facet_wrap(~ORGANIZATION_NAME) +
   geom_vline(aes(xintercept = which(levels(OCCUPANCY_DATE) %in% '2020-05-22T00:00:00')), color="black", linetype="dashed") + 
-  theme(axis.text.x=element_blank(), axis.ticks.x=element_blank())#theme(axis.text.x = element_text(angle=90, hjust=0))
+  #theme(axis.text.x=element_blank(), axis.ticks.x=element_blank()) 
+  theme(axis.text.x = element_text(angle=90, hjust=0))
 
 ```
 
