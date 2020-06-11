@@ -51,29 +51,47 @@ Qs: The effects of covid19 on homeless shelters/homeless?
 #I have separated the data by sector as you suggested but even then the points are very messy. If you can think of a way to 
 # improve this, then go ahead
 
+# from this we can see that men and women make up most of the data (maybe we can exclude the rest?)
+shelterData %>%
+  filter(as.character(SECTOR) == "Co-ed") %>%
+  summarise(n())
+shelterData %>%
+  filter(as.character(SECTOR) == "Families") %>%
+  summarise(n())
+shelterData %>%
+  filter(as.character(SECTOR) == "Men") %>%
+  summarise(n())
+shelterData %>%
+  filter(as.character(SECTOR) == "Women") %>%
+  summarise(n())
+shelterData %>%
+  filter(as.character(SECTOR) == "Youth") %>%
+  summarise(n())
+
 shelterData %>%
   filter(as.character(SECTOR) == "Co-ed" & as.character(OCCUPANCY_DATE) > "2020-03-01T00:00:00") %>%
-  ggplot(aes(x = OCCUPANCY_DATE, y = OCCUPANCY, color = SHELTER_NAME)) + facet_wrap(SHELTER_CITY~ORGANIZATION_NAME) + geom_point()
+  ggplot(aes(x = OCCUPANCY_DATE, y = OCCUPANCY, color = SHELTER_NAME)) + facet_wrap(SHELTER_CITY~ORGANIZATION_NAME) +
+  geom_point() + theme(axis.text.x=element_blank(), axis.ticks.x=element_blank())
 
 shelterData %>%
   filter(as.character(SECTOR) == "Families" & as.character(OCCUPANCY_DATE) > "2020-03-01T00:00:00") %>%
-  ggplot(aes(x = OCCUPANCY_DATE, y = OCCUPANCY, color = SHELTER_NAME)) + facet_wrap(SHELTER_CITY~ORGANIZATION_NAME) + geom_point() + theme(axis.text.x = element_text(angle=90, hjust=0))
+  ggplot(aes(x = OCCUPANCY_DATE, y = OCCUPANCY, color = SHELTER_NAME)) + facet_wrap(SHELTER_CITY~ORGANIZATION_NAME) +     geom_point() + theme(axis.text.x=element_blank(), axis.ticks.x=element_blank())
+
 
 shelterData %>%
   filter(as.character(SECTOR) == "Women" & as.character(OCCUPANCY_DATE) > "2020-03-01T00:00:00") %>%
-  ggplot(aes(x = OCCUPANCY_DATE, y = OCCUPANCY, color = SHELTER_NAME)) + facet_wrap(SHELTER_CITY~ORGANIZATION_NAME) + geom_point() + theme(axis.text.x = element_text(angle=90, hjust=0))
+  ggplot(aes(x = OCCUPANCY_DATE, y = OCCUPANCY, color = SHELTER_NAME)) + facet_wrap(SHELTER_CITY~ORGANIZATION_NAME) +   geom_point() + theme(axis.text.x=element_blank(), axis.ticks.x=element_blank())
+
 
 shelterData %>%
   filter(as.character(SECTOR) == "Men" & as.character(OCCUPANCY_DATE) > "2020-03-01T00:00:00") %>%
-  ggplot(aes(x = OCCUPANCY_DATE, y = OCCUPANCY, color = SHELTER_NAME)) + facet_wrap(SHELTER_CITY~ORGANIZATION_NAME) + geom_point() + theme(axis.text.x = element_text(angle=90, hjust=0))
+  ggplot(aes(x = OCCUPANCY_DATE, y = OCCUPANCY, color = SHELTER_NAME)) + facet_wrap(SHELTER_CITY~ORGANIZATION_NAME) +   geom_point() + theme(axis.text.x=element_blank(), axis.ticks.x=element_blank())
 
-shelterData %>%
-  filter(as.character(SECTOR) == "Men" & as.character(OCCUPANCY_DATE) > "2020-03-01T00:00:00") %>%
-  ggplot(aes(x = OCCUPANCY_DATE, y = OCCUPANCY, color = SHELTER_NAME)) + facet_wrap(SHELTER_CITY~ORGANIZATION_NAME) + geom_point() + theme(axis.text.x = element_text(angle=90, hjust=0))
 
 shelterData %>%
   filter(as.character(SECTOR) == "Youth" & as.character(OCCUPANCY_DATE) > "2020-03-01T00:00:00") %>%
-  ggplot(aes(x = OCCUPANCY_DATE, y = OCCUPANCY, color = SHELTER_NAME)) + facet_wrap(SHELTER_CITY~ORGANIZATION_NAME) + geom_point() + theme(axis.text.x = element_text(angle=90, hjust=0))
+  ggplot(aes(x = OCCUPANCY_DATE, y = OCCUPANCY, color = SHELTER_NAME)) + facet_wrap(SHELTER_CITY~ORGANIZATION_NAME) +   geom_point() + theme(axis.text.x=element_blank(), axis.ticks.x=element_blank())
+
   
 ```
 
@@ -91,3 +109,4 @@ shelterByCovid %>%
 
 
 
+"hello"
