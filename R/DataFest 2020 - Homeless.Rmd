@@ -31,9 +31,6 @@ target <- c("COSTI Reception Centre", "Seaton House", HFS, "Salvation Army - Max
 # Filters the data by reported Covid19 cases
 shelterByCovid <- shelterData %>%
   filter(as.character(SHELTER_NAME) %in% target)
-  
-
-
 
 ```
 
@@ -50,6 +47,7 @@ Qs: The effects of covid19 on homeless shelters/homeless?
 ```{r echo = FALSE}
 #I have separated the data by sector as you suggested but even then the points are very messy. If you can think of a way to 
 # improve this, then go ahead
+
 
 # from this we can see that men and women make up most of the data (maybe we can exclude the rest?)
 shelterData %>%
@@ -72,12 +70,12 @@ shelterData %>%
 
 shelterData %>%
   filter(as.character(SECTOR) == "Women" & as.character(OCCUPANCY_DATE) > "2020-03-01T00:00:00") %>%
-  ggplot(aes(x = OCCUPANCY_DATE, y = OCCUPANCY, color = SHELTER_NAME)) + facet_wrap(SHELTER_CITY~ORGANIZATION_NAME) +   geom_point() + theme(axis.text.x=element_blank(), axis.ticks.x=element_blank())
-
+  ggplot(aes(x = OCCUPANCY_DATE, y = OCCUPANCY, color = SHELTER_NAME)) + facet_wrap(SHELTER_CITY~ORGANIZATION_NAME) + geom_point() + theme(axis.text.x=element_blank(), axis.ticks.x=element_blank()) 
 
 shelterData %>%
   filter(as.character(SECTOR) == "Men" & as.character(OCCUPANCY_DATE) > "2020-03-01T00:00:00") %>%
-  ggplot(aes(x = OCCUPANCY_DATE, y = OCCUPANCY, color = SHELTER_NAME)) + facet_wrap(SHELTER_CITY~ORGANIZATION_NAME) +   geom_point() + theme(axis.text.x=element_blank(), axis.ticks.x=element_blank())
+  ggplot(aes(x = OCCUPANCY_DATE, y = OCCUPANCY, color = SHELTER_NAME)) + facet_wrap(SHELTER_CITY~ORGANIZATION_NAME) + geom_point() + theme(axis.text.x=element_blank(), axis.ticks.x=element_blank()) 
+
 
 
 # shelterData %>%
@@ -105,4 +103,6 @@ Unlike our previous hypothesis, comparing the occupancy of Women shelters around
 
 I believe that this sudden decrease is likely contributed by the emergence of mass infections which occurred at the Homes First Shelter - Willowdale Welcome Center on the 9th of April. Considered as the "largest COVID-19 outbreak in the city's shelter system" by Toronto Star (https://www.thestar.com/news/gta/2020/05/24/how-a-haven-for-refugees-became-home-to-the-worst-covid-19-outbreak-in-torontos-shelter-system.html), it is no doubt that this foreboding news caught the attention of many residents in other shelters. While without solid evidence, I believe such news could have instilled fears among the residents in other Home First Society affiliated shelters, possibly providing a sufficient explanation in the sudden dip in occpancy. 
 
+
 The spread characteristic of the virus could be another factor which possibly explains the decrease/little change in occupancy in shelters. As the virus is infamous for being easily contagious, it is possible that those without homes may have preferred to stay isolated from places with large crowds (i.e. shelters). This hypothesis is supported by the steadily declining numbers in occupancy at many shelters ever since COVID-19 was declared a pandemic. 
+
