@@ -31,9 +31,6 @@ target <- c("COSTI Reception Centre", "Seaton House", HFS, "Salvation Army - Max
 # Filters the data by reported Covid19 cases
 shelterByCovid <- shelterData %>%
   filter(as.character(SHELTER_NAME) %in% target)
-  
-#How Does shelterByCovid filter out the locations to only include the the locations that have COVID-19?
-
 
 ```
 
@@ -47,56 +44,69 @@ Qs: The effects of covid19 on homeless shelters/homeless?
   - want to see if these shelters acted as a hotspot
 
 
-ASSUMPTIONS:
-
-1) ALthough we recognize that the first publicly reported case of COVID-19 can be dated back to November 2019, for the purpose of this project, anything including and after March 23 2020 will be ccounted as "during COVID-19". While anything prior to March 23 2020 will be considered prior to COVID-19.
-
-
 ```{r echo = FALSE}
 #I have separated the data by sector as you suggested but even then the points are very messy. If you can think of a way to 
 # improve this, then go ahead
 
-shelterData %>%
-  filter(as.character(SECTOR) == "Co-ed" & as.character(OCCUPANCY_DATE) > "2020-03-01T00:00:00") %>%
-  ggplot(aes(x = OCCUPANCY_DATE, y = OCCUPANCY, color = SHELTER_NAME)) + facet_wrap(SHELTER_CITY~ORGANIZATION_NAME) + geom_point()
 
+# from this we can see that men and women make up most of the data (maybe we can exclude the rest?)
 shelterData %>%
-  filter(as.character(SECTOR) == "Families" & as.character(OCCUPANCY_DATE) > "2020-03-01T00:00:00") %>%
-  ggplot(aes(x = OCCUPANCY_DATE, y = OCCUPANCY, color = SHELTER_NAME)) + facet_wrap(SHELTER_CITY~ORGANIZATION_NAME) + geom_point() + theme(axis.text.x = element_text(angle=90, hjust=0))
+  filter(as.character(SECTOR) == "Men") %>%
+  summarise(n())
+shelterData %>%
+  filter(as.character(SECTOR) == "Women") %>%
+  summarise(n())
+
+
+# shelterData %>%
+#   filter(as.character(SECTOR) == "Co-ed" & as.character(OCCUPANCY_DATE) > "2020-03-01T00:00:00") %>%
+#   ggplot(aes(x = OCCUPANCY_DATE, y = OCCUPANCY, color = SHELTER_NAME)) + facet_wrap(SHELTER_CITY~ORGANIZATION_NAME) +
+#   geom_point() + theme(axis.text.x=element_blank(), axis.ticks.x=element_blank())
+# 
+# shelterData %>%
+#   filter(as.character(SECTOR) == "Families" & as.character(OCCUPANCY_DATE) > "2020-03-01T00:00:00") %>%
+#   ggplot(aes(x = OCCUPANCY_DATE, y = OCCUPANCY, color = SHELTER_NAME)) + facet_wrap(SHELTER_CITY~ORGANIZATION_NAME) +     geom_point() + theme(axis.text.x=element_blank(), axis.ticks.x=element_blank())
+
 
 shelterData %>%
   filter(as.character(SECTOR) == "Women" & as.character(OCCUPANCY_DATE) > "2020-03-01T00:00:00") %>%
-  ggplot(aes(x = OCCUPANCY_DATE, y = OCCUPANCY, color = SHELTER_NAME)) + facet_wrap(SHELTER_CITY~ORGANIZATION_NAME) + geom_point() + theme(axis.text.x = element_text(angle=90, hjust=0))
+  ggplot(aes(x = OCCUPANCY_DATE, y = OCCUPANCY, color = SHELTER_NAME)) + facet_wrap(SHELTER_CITY~ORGANIZATION_NAME) + geom_point() + theme(axis.text.x=element_blank(), axis.ticks.x=element_blank()) 
 
 shelterData %>%
   filter(as.character(SECTOR) == "Men" & as.character(OCCUPANCY_DATE) > "2020-03-01T00:00:00") %>%
-  ggplot(aes(x = OCCUPANCY_DATE, y = OCCUPANCY, color = SHELTER_NAME)) + facet_wrap(SHELTER_CITY~ORGANIZATION_NAME) + geom_point() + theme(axis.text.x = element_text(angle=90, hjust=0))
+  ggplot(aes(x = OCCUPANCY_DATE, y = OCCUPANCY, color = SHELTER_NAME)) + facet_wrap(SHELTER_CITY~ORGANIZATION_NAME) + geom_point() + theme(axis.text.x=element_blank(), axis.ticks.x=element_blank()) 
 
-shelterData %>%
-  filter(as.character(SECTOR) == "Men" & as.character(OCCUPANCY_DATE) > "2020-03-01T00:00:00") %>%
-  ggplot(aes(x = OCCUPANCY_DATE, y = OCCUPANCY, color = SHELTER_NAME)) + facet_wrap(SHELTER_CITY~ORGANIZATION_NAME) + geom_point() + theme(axis.text.x = element_text(angle=90, hjust=0))
 
-shelterData %>%
-  filter(as.character(SECTOR) == "Youth" & as.character(OCCUPANCY_DATE) > "2020-03-01T00:00:00") %>%
-  ggplot(aes(x = OCCUPANCY_DATE, y = OCCUPANCY, color = SHELTER_NAME)) + facet_wrap(SHELTER_CITY~ORGANIZATION_NAME) + geom_point() + theme(axis.text.x = element_text(angle=90, hjust=0))
+
+# shelterData %>%
+#   filter(as.character(SECTOR) == "Youth" & as.character(OCCUPANCY_DATE) > "2020-03-01T00:00:00") %>%
+#   ggplot(aes(x = OCCUPANCY_DATE, y = OCCUPANCY, color = SHELTER_NAME)) + facet_wrap(SHELTER_CITY~ORGANIZATION_NAME) +   geom_point() + theme(axis.text.x=element_blank(), axis.ticks.x=element_blank())
+
   
 ```
 
 ```{r echo = FALSE}
 # this is on the side, since i wanted to see if the numbers dropped after a covid19 case was reported on some of these shelters
 shelterByCovid %>%
-  filter(as.character(OCCUPANCY_DATE) > "2020-03-01T00:00:00" & as.character(ORGANIZATION_NAME) == "Homes First Society") %>%
+  filter(as.character(OCCUPANCY_DATE) > "2020-03-01T00:00:00" & as.character(ORGANIZATION_NAME) == "Homes First Society"
+         & as.character(SECTOR) == "Women") %>%
   mutate(log_occupancy = log(OCCUPANCY)) %>%
   ggplot(aes(x = OCCUPANCY_DATE, y = OCCUPANCY, color = SHELTER_NAME)) + geom_point() + 
   facet_wrap(~ORGANIZATION_NAME) +
-  geom_vline(aes(xintercept = as.character(OCCUPANCY_DATE) == "2020-05-22T00:00:00"), color="black", linetype="dashed") + 
+  geom_vline(aes(xintercept = '2020-04-09T00:00:00'), color="black", linetype="dashed") + 
+  geom_vline(aes(xintercept = '2020-03-17T00:00:00'), color="red", linetype="dashed") +
+  #theme(axis.text.x=element_blank(), axis.ticks.x=element_blank()) 
   theme(axis.text.x = element_text(angle=90, hjust=0))
 
 ```
+Unlike our previous hypothesis, comparing the occupancy of Women shelters around Scarborough and Toronto have shown either a general decrease in numbers or minimal changes at best. Only one stands as an exception to this, which is the Home First Society Women's sector, where there have been a slight increase in numbers ever since Toronto's lock-down on March 17  (indicated by a red line). However, even this facility shows to illustrate a much steeper decrease around April 21st. 
+
+I believe that this sudden decrease is likely contributed by the emergence of mass infections which occurred at the Homes First Shelter - Willowdale Welcome Center on the 9th of April. Considered as the "largest COVID-19 outbreak in the city's shelter system" by Toronto Star (https://www.thestar.com/news/gta/2020/05/24/how-a-haven-for-refugees-became-home-to-the-worst-covid-19-outbreak-in-torontos-shelter-system.html), it is no doubt that this foreboding news caught the attention of many residents in other shelters. While without solid evidence, I believe such news could have instilled fears among the residents in other Home First Society affiliated shelters, possibly providing a sufficient explanation in the sudden dip in occpancy. 
 
 
+The spread characteristic of the virus could be another factor which possibly explains the decrease/little change in occupancy in shelters. As the virus is infamous for being easily contagious, it is possible that those without homes may have preferred to stay isolated from places with large crowds (i.e. shelters). This hypothesis is supported by the steadily declining numbers in occupancy at many shelters ever since COVID-19 was declared a pandemic. 
 
-
+<<<<<<< HEAD
 
 
 ```{r echo=FALSE}
@@ -205,3 +215,5 @@ qqnorm((1 / (shelterData$OCCUPANCY)), cex=0.5, ylab = "Inverse of Occupancy", ma
 qqline(1 /(shelterData$OCCUPANCY))
 ```
 
+=======
+>>>>>>> 29f7a30b8436551810888cc216cceb73f652f444
