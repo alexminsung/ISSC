@@ -18,8 +18,8 @@ library(ggplot2)
 shelterData <- read.csv("https://raw.githubusercontent.com/alexminsung/ISSC/master/data/Daily%20shelter%20occpancy%20current.csv?token=APUVSRCQBS7QDHDGTMGCLMS65JGQU")
 attach(shelterData)
 
-shelterData %>% 
-  distinct(SHELTER_NAME)
+# shelterData %>% 
+#   distinct(SHELTER_NAME)
 
 # Finds all rows that starts witih "HFS"
 HFS <- grep("^HFS", as.character(shelterData$SHELTER_NAME), value = TRUE)
@@ -70,11 +70,13 @@ shelterData %>%
 
 shelterData %>%
   filter(as.character(SECTOR) == "Women" & as.character(OCCUPANCY_DATE) > "2020-03-01T00:00:00") %>%
-  ggplot(aes(x = OCCUPANCY_DATE, y = OCCUPANCY, color = SHELTER_NAME)) + facet_wrap(SHELTER_CITY~ORGANIZATION_NAME) + geom_point() + theme(axis.text.x=element_blank(), axis.ticks.x=element_blank()) 
+  mutate(relaFreq = OCCUPANCY/CAPACITY) %>%
+  ggplot(aes(x = OCCUPANCY_DATE, y = relaFreq, color = SHELTER_NAME)) + facet_wrap(SHELTER_CITY~ORGANIZATION_NAME) + geom_point() + theme(axis.text.x=element_blank(), axis.ticks.x=element_blank()) 
 
 shelterData %>%
   filter(as.character(SECTOR) == "Men" & as.character(OCCUPANCY_DATE) > "2020-03-01T00:00:00") %>%
-  ggplot(aes(x = OCCUPANCY_DATE, y = OCCUPANCY, color = SHELTER_NAME)) + facet_wrap(SHELTER_CITY~ORGANIZATION_NAME) + geom_point() + theme(axis.text.x=element_blank(), axis.ticks.x=element_blank()) 
+  mutate(relaFreq = OCCUPANCY/CAPACITY) %>%
+  ggplot(aes(x = OCCUPANCY_DATE, y = relaFreq, color = SHELTER_NAME)) + facet_wrap(SHELTER_CITY~ORGANIZATION_NAME) + geom_point() + theme(axis.text.x=element_blank(), axis.ticks.x=element_blank()) 
 
 
 
