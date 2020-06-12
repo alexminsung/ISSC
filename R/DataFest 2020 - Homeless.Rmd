@@ -31,9 +31,6 @@ target <- c("COSTI Reception Centre", "Seaton House", HFS, "Salvation Army - Max
 # Filters the data by reported Covid19 cases
 shelterByCovid <- shelterData %>%
   filter(as.character(SHELTER_NAME) %in% target)
-  
-
-
 
 ```
 
@@ -50,6 +47,13 @@ Qs: The effects of covid19 on homeless shelters/homeless?
 ```{r echo = FALSE}
 #I have separated the data by sector as you suggested but even then the points are very messy. If you can think of a way to 
 # improve this, then go ahead
+
+#Filter the data by Sectors:
+#Men Sector:
+shelterByMen <- shelterData %>%
+  filter(as.character(SECTOR) %in% target_0)
+
+
 
 # from this we can see that men and women make up most of the data (maybe we can exclude the rest?)
 shelterData %>%
@@ -72,12 +76,12 @@ shelterData %>%
 
 shelterData %>%
   filter(as.character(SECTOR) == "Women" & as.character(OCCUPANCY_DATE) > "2020-03-01T00:00:00") %>%
-  ggplot(aes(x = OCCUPANCY_DATE, y = OCCUPANCY, color = SHELTER_NAME)) + facet_wrap(SHELTER_CITY~ORGANIZATION_NAME) +   geom_point() + theme(axis.text.x=element_blank(), axis.ticks.x=element_blank())
-
+  ggplot(aes(x = OCCUPANCY_DATE, y = OCCUPANCY, color = SHELTER_NAME)) + facet_wrap(SHELTER_CITY~ORGANIZATION_NAME) + geom_point() + theme(axis.text.x=element_blank(), axis.ticks.x=element_blank()) 
 
 shelterData %>%
   filter(as.character(SECTOR) == "Men" & as.character(OCCUPANCY_DATE) > "2020-03-01T00:00:00") %>%
-  ggplot(aes(x = OCCUPANCY_DATE, y = OCCUPANCY, color = SHELTER_NAME)) + facet_wrap(SHELTER_CITY~ORGANIZATION_NAME) +   geom_point() + theme(axis.text.x=element_blank(), axis.ticks.x=element_blank())
+  ggplot(aes(x = OCCUPANCY_DATE, y = OCCUPANCY, color = SHELTER_NAME)) + facet_wrap(SHELTER_CITY~ORGANIZATION_NAME) + geom_point() + theme(axis.text.x=element_blank(), axis.ticks.x=element_blank()) 
+
 
 
 # shelterData %>%
@@ -95,12 +99,370 @@ shelterByCovid %>%
   mutate(log_occupancy = log(OCCUPANCY)) %>%
   ggplot(aes(x = OCCUPANCY_DATE, y = OCCUPANCY, color = SHELTER_NAME)) + geom_point() + 
   facet_wrap(~ORGANIZATION_NAME) +
-  geom_vline(aes(xintercept = which(levels(OCCUPANCY_DATE) %in% '2020-05-22T00:00:00')), color="black", linetype="dashed") + 
+  geom_vline(aes(xintercept = '2020-04-09T00:00:00'), color="black", linetype="dashed") + 
+  geom_vline(aes(xintercept = '2020-03-17T00:00:00'), color="red", linetype="dashed") +
   #theme(axis.text.x=element_blank(), axis.ticks.x=element_blank()) 
   theme(axis.text.x = element_text(angle=90, hjust=0))
 
 ```
+Unlike our previous hypothesis, comparing the occupancy of Women shelters around Scarborough and Toronto have shown either a general decrease in numbers or minimal changes at best. Only one stands as an exception to this, which is the Home First Society Women's sector, where there have been a slight increase in numbers ever since Toronto's lock-down on March 17  (indicated by a red line). However, even this facility shows to illustrate a much steeper decrease around April 21st. 
 
+I believe that this sudden decrease is likely contributed by the emergence of mass infections which occurred at the Homes First Shelter - Willowdale Welcome Center on the 9th of April. Considered as the "largest COVID-19 outbreak in the city's shelter system" by Toronto Star (https://www.thestar.com/news/gta/2020/05/24/how-a-haven-for-refugees-became-home-to-the-worst-covid-19-outbreak-in-torontos-shelter-system.html), it is no doubt that this foreboding news caught the attention of many residents in other shelters. While without solid evidence, I believe such news could have instilled fears among the residents in other Home First Society affiliated shelters, possibly providing a sufficient explanation in the sudden dip in occpancy. 
+
+
+The spread characteristic of the virus could be another factor which possibly explains the decrease/little change in occupancy in shelters. As the virus is infamous for being easily contagious, it is possible that those without homes may have preferred to stay isolated from places with large crowds (i.e. shelters). This hypothesis is supported by the steadily declining numbers in occupancy at many shelters ever since COVID-19 was declared a pandemic. 
+
+<<<<<<< HEAD
+
+
+```{r echo=FALSE}
+
+library(loon)
+library(loon.data)
+#data(shelterData)
+data(igg1)
+summary(igg1)
+summary(shelterData)
+library(loon.ggplot)
+#This is me trying to replicate the results with our dataset
+atom_info <- with(shelterData,
+                  paste0(OCCUPANCY_DATE, "_", name, "\n",
+                         "CAPACITY", Capacity, "\n",
+                         "SECTOR", Sector, "\n",
+                         "X_id", ID)
+)
+
+
+#This is me trying to replicate the results with our dataset
+atom_info <- with(shelterData,
+                  paste0(OCCUPANCY_DATE, "\n",
+                         "CAPACITY", Capacity, "\n",
+                         "SECTOR", Sector, "\n",
+                         "X_id", ID)
+)
+
+
+#THIS IS THE CODE I was trying from
+atom_info <- with(igg1,
+                  paste0(recordType, ": ",  name, "\n",        # Note newline characters
+                         "Residue: ", residue, "\n",
+                         "Residue Name: ", residueName, "\n",
+                         "Group: ", group, "\n",
+                         "Chain ID: ",  chainID)
+)
+
+
+#This was me messing aruond with the code
+p3d <- with(igg1,
+            l_plot3D(x = x, y = y, z = z,
+                     # Rest of arguments are as in l_plot()
+                     itemLabel = atom_info,
+                     showItemLabels = FALSE,  # <- show tool tips?
+                     showLabels = TRUE,       # <- show axis labels and title?
+                     showGuides = TRUE,   
+                     linkingGroup = "igg1",
+                     title = "human IgG1 molecule")
+)
+```
 
 
 "hello"
+
+
+
+
+```{r echo=FALSE}
+#TRYING MY STUFF OUT TO DETERMINE A LINEAR REGRESSION MODEL
+
+#First get an unfiltered view of the raw data:
+attach(shelterData)
+view(shelterData)
+
+#The PURPOSE of this report is to see whether there is a change in the number Occupancy.
+# $H_{0}$: There is no significant change in the occupancy after the lockdown in Toronto (i.e. March 17)
+# $H_{1}$: There is a significant change in the occupancy after the lockdown in Toronto
+#We will be using a significance level of 5% (i.e. 0.05) (Do you think 5% is reasonable?)
+
+#QUESTION FOR ALEX: SHOULD WE CHANGE THE DATE OF THE LOCKDOWN FROM MARCH 17TH TO MARCH 24TH OR MARCH 30TH?????
+
+boxplot(OCCUPANCY, main = "9839 Boxplot Boxplot", ylab = "Occupancy Number")
+#From this plot it can be seen that the data is very volatile, beacuse there is a significant portion of the data outside of the whiskers
+
+shelterData %>%
+  ggplot(aes(x = OCCUPANCY_DATE, y = OCCUPANCY)) + geom_point()
+
+#Find a way to include Shape, and color for this gg-plot (Notice: that it should be shape = SHELTER_NAME)
+
+#It can be noticed through the gg-plot that two shelters had a dramtic decrease in Occupancy as time progressed. While the other shelters either decreased a little bit as time progressed or increased a little bit as time progressed or basically stated the same.
+
+#We are now going to create a regression line with occupancy on the y-axis and occupancy date on the x-axis to see if the data behaves normally
+#shelterData %>%
+qqnorm(shelterData$OCCUPANCY, ylab = "Occupancy", main = "Hello")
+qqline(shelterData$OCCUPANCY)
+
+#From the graph it can be seen that this variable is not normal, because it does not closely follow the regression line.
+
+#Applying a log transformation to the Response Variable Occupancy:
+OCCUPANCY <- as.numeric(OCCUPANCY)
+#Problem when converting values from 0 to lo10(0), because log10(0) give negative infintity
+qqnorm(log10(shelterData$OCCUPANCY), cex=0.5, ylab = "Log to base 10 of Sale Price", main = "9839")
+qqline(log10(shelterData$OCCUPANCY))
+
+
+
+
+#APPLYING A SQRT transformation to the response variable
+qqnorm(sqrt(shelterData$OCCUPANCY), cex=0.5, ylab = "Square Root of Occupancy", main = "9839 Sqrt")
+qqline(sqrt(shelterData$OCCUPANCY))
+
+
+#Applying an inverse transformation to the response variable
+qqnorm((1 / (shelterData$OCCUPANCY)), cex=0.5, ylab = "Inverse of Occupancy", main = "9839 INverse")
+qqline(1 /(shelterData$OCCUPANCY))
+```
+
+
+
+
+```{r echo=FALSE}
+library(shiny)
+library(shinydashboard)
+library(tidyverse)
+library(ggplot2)
+
+#Reading the csv
+shelterData <- read.csv("https://raw.githubusercontent.com/alexminsung/ISSC/master/data/Daily%20shelter%20occpancy%20current.csv?token=APUVSRCQBS7QDHDGTMGCLMS65JGQU")
+attach(shelterData)
+
+shelterData %>% 
+  distinct(SECTOR)
+
+# Finds all rows that starts witih "HFS"
+HFS <- grep("^HFS", as.character(shelterData$SHELTER_NAME), value = TRUE)
+
+# List of men sectors
+target_0 <- c("Men")
+
+# List of women sectors
+target_1 <- c("Women")
+
+# List of co-ed sectors
+target_2 <- c("Co-ed")
+
+# List of youth sectors
+target_3 <- c("Families")
+
+# List of family sectors
+target_4 <- c("Youth")
+
+#Filter the data by Sectors:
+#Men Sector:
+shelterByMen <- shelterData %>%
+  filter(as.character(SECTOR) %in% target_0)
+
+#Women Sector:
+shelterByWomen <- shelterData %>%
+  filter(as.character(SECTOR) %in% target_1)
+
+#Co-ed Sector:
+shelterByCoed <- shelterData %>%
+  filter(as.character(SECTOR) %in% target_2)
+
+#Families Sector:
+shelterByFamilies <- shelterData %>%
+  filter(as.character(SECTOR) %in% target_3)
+
+#Youth Sector:
+shelterByYouth <- shelterData %>%
+  filter(as.character(SECTOR) %in% target_4)
+
+#Seeing gg-plots of each sector:
+shelterByYouth %>%
+  ggplot(aes(x = OCCUPANCY_DATE, y = OCCUPANCY)) + geom_point()
+
+#Total Occupancy of Men over the dates:
+sum(shelterByMen$OCCUPANCY)
+
+#Total Occupancy of Women over the dates:
+sum(shelterByWomen$OCCUPANCY)
+
+#Total Occupancy of Co-eds over the dates:
+sum(shelterByCoed$OCCUPANCY)
+
+#Total Occupancy of Families over the dates:
+sum(shelterByFamilies$OCCUPANCY)
+
+#Total Occupancy of Youths over the dates:
+sum(shelterByYouth$OCCUPANCY)
+
+#Total Occupancy:
+sum(shelterData$OCCUPANCY)
+
+#Now I am Subdividing the data onto a month by month basis:
+#Men for a month by month basis:
+men_january <- c("2020-01-01T00:00:00", "2020-01-02T00:00:00", "2020-01-03T00:00:00", "2020-01-04T00:00:00", "2020-01-05T00:00:00", "2020-01-06T00:00:00", "2020-01-07T00:00:00", "2020-01-08T00:00:00", "2020-01-09T00:00:00", "2020-01-10T00:00:00", "2020-01-11T00:00:00", "2020-01-12T00:00:00", "2020-01-13T00:00:00", "2020-01-14T00:00:00", "2020-01-15T00:00:00", "2020-01-16T00:00:00", "2020-01-17T00:00:00", "2020-01-18T00:00:00", "2020-01-19T00:00:00", "2020-01-20T00:00:00", "2020-01-21T00:00:00", "2020-01-22T00:00:00", "2020-01-23T00:00:00", "2020-01-24T00:00:00", "2020-01-25T00:00:00", "2020-01-26T00:00:00", "2020-01-27T00:00:00", "2020-01-28T00:00:00", "2020-01-29T00:00:00", "2020-01-30T00:00:00", "2020-01-31T00:00:00")
+
+men_february <- c("2020-02-01T00:00:00", "2020-02-02T00:00:00", "2020-02-03T00:00:00", "2020-02-04T00:00:00", "2020-02-05T00:00:00", "2020-02-06T00:00:00", "2020-02-07T00:00:00", "2020-02-08T00:00:00", "2020-02-09T00:00:00", "2020-02-10T00:00:00", "2020-02-11T00:00:00", "2020-02-12T00:00:00", "2020-02-13T00:00:00", "2020-02-14T00:00:00", "2020-02-15T00:00:00", "2020-02-16T00:00:00", "2020-02-17T00:00:00", "2020-02-18T00:00:00", "2020-02-19T00:00:00", "2020-02-20T00:00:00", "2020-02-21T00:00:00", "2020-02-22T00:00:00", "2020-02-23T00:00:00", "2020-02-24T00:00:00", "2020-02-25T00:00:00", "2020-02-26T00:00:00", "2020-02-27T00:00:00", "2020-02-28T00:00:00", "2020-02-29T00:00:00")
+
+men_march <- c("2020-03-01T00:00:00", "2020-03-02T00:00:00", "2020-03-03T00:00:00", "2020-03-04T00:00:00", "2020-03-05T00:00:00", "2020-03-06T00:00:00", "2020-03-07T00:00:00", "2020-03-08T00:00:00", "2020-03-09T00:00:00", "2020-03-10T00:00:00", "2020-03-11T00:00:00", "2020-03-12T00:00:00", "2020-03-13T00:00:00", "2020-03-14T00:00:00", "2020-03-15T00:00:00", "2020-03-16T00:00:00", "2020-03-17T00:00:00", "2020-03-18T00:00:00", "2020-03-19T00:00:00", "2020-03-20T00:00:00", "2020-03-21T00:00:00", "2020-03-22T00:00:00", "2020-03-23T00:00:00", "2020-03-24T00:00:00", "2020-03-25T00:00:00", "2020-03-26T00:00:00", "2020-03-27T00:00:00", "2020-03-28T00:00:00", "2020-03-29T00:00:00", "2020-03-30T00:00:00", "2020-03-31T00:00:00")
+
+men_april <- c("2020-04-01T00:00:00", "2020-04-02T00:00:00", "2020-04-03T00:00:00", "2020-04-04T00:00:00", "2020-04-05T00:00:00", "2020-04-06T00:00:00", "2020-04-07T00:00:00", "2020-04-08T00:00:00", "2020-04-09T00:00:00", "2020-04-10T00:00:00", "2020-04-11T00:00:00", "2020-04-12T00:00:00", "2020-04-13T00:00:00", "2020-04-14T00:00:00", "2020-04-15T00:00:00", "2020-04-16T00:00:00", "2020-04-17T00:00:00", "2020-04-18T00:00:00", "2020-04-19T00:00:00", "2020-04-20T00:00:00", "2020-04-21T00:00:00", "2020-04-22T00:00:00", "2020-04-23T00:00:00", "2020-04-24T00:00:00", "2020-04-25T00:00:00", "2020-04-26T00:00:00", "2020-04-27T00:00:00", "2020-04-28T00:00:00", "2020-04-29T00:00:00", "2020-04-30T00:00:00")
+
+men_may <- c("2020-05-01T00:00:00", "2020-05-02T00:00:00", "2020-05-03T00:00:00", "2020-05-04T00:00:00", "2020-05-05T00:00:00", "2020-05-06T00:00:00", "2020-05-07T00:00:00", "2020-05-08T00:00:00", "2020-05-09T00:00:00", "2020-05-10T00:00:00", "2020-05-11T00:00:00", "2020-05-12T00:00:00", "2020-05-13T00:00:00", "2020-05-14T00:00:00", "2020-05-15T00:00:00", "2020-05-16T00:00:00", "2020-05-17T00:00:00", "2020-05-18T00:00:00", "2020-05-19T00:00:00", "2020-05-20T00:00:00", "2020-05-21T00:00:00", "2020-05-22T00:00:00", "2020-05-23T00:00:00", "2020-05-24T00:00:00", "2020-05-25T00:00:00", "2020-05-26T00:00:00", "2020-05-27T00:00:00", "2020-05-28T00:00:00", "2020-05-29T00:00:00", "2020-05-30T00:00:00", "2020-05-31T00:00:00")
+
+men_june <- c("2020-06-01T00:00:00", "2020-06-02T00:00:00", "2020-06-03T00:00:00", "2020-06-04T00:00:00", "2020-06-05T00:00:00", "2020-06-06T00:00:00", "2020-06-07T00:00:00", "2020-06-08T00:00:00")
+
+# Filters the data by Occupancy Date
+men_Jan_shelter <- shelterByMen %>%
+  filter(as.character(OCCUPANCY_DATE) %in% men_january)
+
+men_Feb_shelter <- shelterByMen %>%
+  filter(as.character(OCCUPANCY_DATE) %in% men_february)
+
+men_March_shelter <- shelterByMen %>%
+  filter(as.character(OCCUPANCY_DATE) %in% men_march)
+
+men_April_shelter <- shelterByMen %>%
+  filter(as.character(OCCUPANCY_DATE) %in% men_april)
+
+men_May_shelter <- shelterByMen %>%
+  filter(as.character(OCCUPANCY_DATE) %in% men_may)
+
+men_June_shelter <- shelterByMen %>%
+  filter(as.character(OCCUPANCY_DATE) %in% men_june)
+
+
+
+#gg-plots on a month by month basis:
+men_Jan_shelter %>%
+  ggplot(aes(x = OCCUPANCY_DATE, y = OCCUPANCY, color = SHELTER_NAME)) + facet_wrap(SHELTER_CITY~ORGANIZATION_NAME) + geom_point() + theme(axis.text.x=element_blank(), axis.ticks.x=element_blank()) 
+
+men_Feb_shelter %>%
+  ggplot(aes(x = OCCUPANCY_DATE, y = OCCUPANCY, color = SHELTER_NAME)) + facet_wrap(SHELTER_CITY~ORGANIZATION_NAME) + geom_point() + theme(axis.text.x=element_blank(), axis.ticks.x=element_blank()) 
+
+men_March_shelter %>%
+  ggplot(aes(x = OCCUPANCY_DATE, y = OCCUPANCY, color = SHELTER_NAME)) + facet_wrap(SHELTER_CITY~ORGANIZATION_NAME) + geom_point() + theme(axis.text.x=element_blank(), axis.ticks.x=element_blank()) 
+
+men_April_shelter %>%
+  ggplot(aes(x = OCCUPANCY_DATE, y = OCCUPANCY, color = SHELTER_NAME)) + facet_wrap(SHELTER_CITY~ORGANIZATION_NAME) + geom_point() + theme(axis.text.x=element_blank(), axis.ticks.x=element_blank()) 
+
+men_May_shelter %>%
+  ggplot(aes(x = OCCUPANCY_DATE, y = OCCUPANCY, color = SHELTER_NAME)) + facet_wrap(SHELTER_CITY~ORGANIZATION_NAME) + geom_point() + theme(axis.text.x=element_blank(), axis.ticks.x=element_blank()) 
+
+men_June_shelter %>%
+  ggplot(aes(x = OCCUPANCY_DATE, y = OCCUPANCY, color = SHELTER_NAME)) + facet_wrap(SHELTER_CITY~ORGANIZATION_NAME) + geom_point() + theme(axis.text.x=element_blank(), axis.ticks.x=element_blank())
+
+
+### Now The Women:
+#Men for a month by month basis:
+women_january <- c("2020-01-01T00:00:00", "2020-01-02T00:00:00", "2020-01-03T00:00:00", "2020-01-04T00:00:00", "2020-01-05T00:00:00", "2020-01-06T00:00:00", "2020-01-07T00:00:00", "2020-01-08T00:00:00", "2020-01-09T00:00:00", "2020-01-10T00:00:00", "2020-01-11T00:00:00", "2020-01-12T00:00:00", "2020-01-13T00:00:00", "2020-01-14T00:00:00", "2020-01-15T00:00:00", "2020-01-16T00:00:00", "2020-01-17T00:00:00", "2020-01-18T00:00:00", "2020-01-19T00:00:00", "2020-01-20T00:00:00", "2020-01-21T00:00:00", "2020-01-22T00:00:00", "2020-01-23T00:00:00", "2020-01-24T00:00:00", "2020-01-25T00:00:00", "2020-01-26T00:00:00", "2020-01-27T00:00:00", "2020-01-28T00:00:00", "2020-01-29T00:00:00", "2020-01-30T00:00:00", "2020-01-31T00:00:00")
+
+women_february <- c("2020-02-01T00:00:00", "2020-02-02T00:00:00", "2020-02-03T00:00:00", "2020-02-04T00:00:00", "2020-02-05T00:00:00", "2020-02-06T00:00:00", "2020-02-07T00:00:00", "2020-02-08T00:00:00", "2020-02-09T00:00:00", "2020-02-10T00:00:00", "2020-02-11T00:00:00", "2020-02-12T00:00:00", "2020-02-13T00:00:00", "2020-02-14T00:00:00", "2020-02-15T00:00:00", "2020-02-16T00:00:00", "2020-02-17T00:00:00", "2020-02-18T00:00:00", "2020-02-19T00:00:00", "2020-02-20T00:00:00", "2020-02-21T00:00:00", "2020-02-22T00:00:00", "2020-02-23T00:00:00", "2020-02-24T00:00:00", "2020-02-25T00:00:00", "2020-02-26T00:00:00", "2020-02-27T00:00:00", "2020-02-28T00:00:00", "2020-02-29T00:00:00")
+
+women_march <- c("2020-03-01T00:00:00", "2020-03-02T00:00:00", "2020-03-03T00:00:00", "2020-03-04T00:00:00", "2020-03-05T00:00:00", "2020-03-06T00:00:00", "2020-03-07T00:00:00", "2020-03-08T00:00:00", "2020-03-09T00:00:00", "2020-03-10T00:00:00", "2020-03-11T00:00:00", "2020-03-12T00:00:00", "2020-03-13T00:00:00", "2020-03-14T00:00:00", "2020-03-15T00:00:00", "2020-03-16T00:00:00", "2020-03-17T00:00:00", "2020-03-18T00:00:00", "2020-03-19T00:00:00", "2020-03-20T00:00:00", "2020-03-21T00:00:00", "2020-03-22T00:00:00", "2020-03-23T00:00:00", "2020-03-24T00:00:00", "2020-03-25T00:00:00", "2020-03-26T00:00:00", "2020-03-27T00:00:00", "2020-03-28T00:00:00", "2020-03-29T00:00:00", "2020-03-30T00:00:00", "2020-03-31T00:00:00")
+
+women_april <- c("2020-04-01T00:00:00", "2020-04-02T00:00:00", "2020-04-03T00:00:00", "2020-04-04T00:00:00", "2020-04-05T00:00:00", "2020-04-06T00:00:00", "2020-04-07T00:00:00", "2020-04-08T00:00:00", "2020-04-09T00:00:00", "2020-04-10T00:00:00", "2020-04-11T00:00:00", "2020-04-12T00:00:00", "2020-04-13T00:00:00", "2020-04-14T00:00:00", "2020-04-15T00:00:00", "2020-04-16T00:00:00", "2020-04-17T00:00:00", "2020-04-18T00:00:00", "2020-04-19T00:00:00", "2020-04-20T00:00:00", "2020-04-21T00:00:00", "2020-04-22T00:00:00", "2020-04-23T00:00:00", "2020-04-24T00:00:00", "2020-04-25T00:00:00", "2020-04-26T00:00:00", "2020-04-27T00:00:00", "2020-04-28T00:00:00", "2020-04-29T00:00:00", "2020-04-30T00:00:00")
+
+women_may <- c("2020-05-01T00:00:00", "2020-05-02T00:00:00", "2020-05-03T00:00:00", "2020-05-04T00:00:00", "2020-05-05T00:00:00", "2020-05-06T00:00:00", "2020-05-07T00:00:00", "2020-05-08T00:00:00", "2020-05-09T00:00:00", "2020-05-10T00:00:00", "2020-05-11T00:00:00", "2020-05-12T00:00:00", "2020-05-13T00:00:00", "2020-05-14T00:00:00", "2020-05-15T00:00:00", "2020-05-16T00:00:00", "2020-05-17T00:00:00", "2020-05-18T00:00:00", "2020-05-19T00:00:00", "2020-05-20T00:00:00", "2020-05-21T00:00:00", "2020-05-22T00:00:00", "2020-05-23T00:00:00", "2020-05-24T00:00:00", "2020-05-25T00:00:00", "2020-05-26T00:00:00", "2020-05-27T00:00:00", "2020-05-28T00:00:00", "2020-05-29T00:00:00", "2020-05-30T00:00:00", "2020-05-31T00:00:00")
+
+women_june <- c("2020-06-01T00:00:00", "2020-06-02T00:00:00", "2020-06-03T00:00:00", "2020-06-04T00:00:00", "2020-06-05T00:00:00", "2020-06-06T00:00:00", "2020-06-07T00:00:00", "2020-06-08T00:00:00")
+
+# Filters the data by Occupancy Date
+women_Jan_shelter <- shelterByWomen %>%
+  filter(as.character(OCCUPANCY_DATE) %in% women_january)
+
+women_Feb_shelter <- shelterByWomen %>%
+  filter(as.character(OCCUPANCY_DATE) %in% women_february)
+
+women_March_shelter <- shelterByWomen %>%
+  filter(as.character(OCCUPANCY_DATE) %in% women_march)
+
+women_April_shelter <- shelterByWomen %>%
+  filter(as.character(OCCUPANCY_DATE) %in% women_april)
+
+women_May_shelter <- shelterByWomen %>%
+  filter(as.character(OCCUPANCY_DATE) %in% women_may)
+
+women_June_shelter <- shelterByWomen %>%
+  filter(as.character(OCCUPANCY_DATE) %in% women_june)
+
+
+
+#gg-plots on a month by month basis:
+women_Jan_shelter %>%
+  ggplot(aes(x = OCCUPANCY_DATE, y = OCCUPANCY, color = SHELTER_NAME)) + facet_wrap(SHELTER_CITY~ORGANIZATION_NAME) + geom_point() + theme(axis.text.x=element_blank(), axis.ticks.x=element_blank()) 
+
+Women_Feb_shelter %>%
+  ggplot(aes(x = OCCUPANCY_DATE, y = OCCUPANCY, color = SHELTER_NAME)) + facet_wrap(SHELTER_CITY~ORGANIZATION_NAME) + geom_point() + theme(axis.text.x=element_blank(), axis.ticks.x=element_blank()) 
+
+Women_March_shelter %>%
+  ggplot(aes(x = OCCUPANCY_DATE, y = OCCUPANCY, color = SHELTER_NAME)) + facet_wrap(SHELTER_CITY~ORGANIZATION_NAME) + geom_point() + theme(axis.text.x=element_blank(), axis.ticks.x=element_blank()) 
+
+Women_April_shelter %>%
+  ggplot(aes(x = OCCUPANCY_DATE, y = OCCUPANCY, color = SHELTER_NAME)) + facet_wrap(SHELTER_CITY~ORGANIZATION_NAME) + geom_point() + theme(axis.text.x=element_blank(), axis.ticks.x=element_blank()) 
+
+Women_May_shelter %>%
+  ggplot(aes(x = OCCUPANCY_DATE, y = OCCUPANCY, color = SHELTER_NAME)) + facet_wrap(SHELTER_CITY~ORGANIZATION_NAME) + geom_point() + theme(axis.text.x=element_blank(), axis.ticks.x=element_blank()) 
+
+Women_June_shelter %>%
+  ggplot(aes(x = OCCUPANCY_DATE, y = OCCUPANCY, color = SHELTER_NAME)) + facet_wrap(SHELTER_CITY~ORGANIZATION_NAME) + geom_point() + theme(axis.text.x=element_blank(), axis.ticks.x=element_blank())
+
+### Now The Co-eds:
+#Co-eds for a month by month basis:
+coed_january <- c("2020-01-01T00:00:00", "2020-01-02T00:00:00", "2020-01-03T00:00:00", "2020-01-04T00:00:00", "2020-01-05T00:00:00", "2020-01-06T00:00:00", "2020-01-07T00:00:00", "2020-01-08T00:00:00", "2020-01-09T00:00:00", "2020-01-10T00:00:00", "2020-01-11T00:00:00", "2020-01-12T00:00:00", "2020-01-13T00:00:00", "2020-01-14T00:00:00", "2020-01-15T00:00:00", "2020-01-16T00:00:00", "2020-01-17T00:00:00", "2020-01-18T00:00:00", "2020-01-19T00:00:00", "2020-01-20T00:00:00", "2020-01-21T00:00:00", "2020-01-22T00:00:00", "2020-01-23T00:00:00", "2020-01-24T00:00:00", "2020-01-25T00:00:00", "2020-01-26T00:00:00", "2020-01-27T00:00:00", "2020-01-28T00:00:00", "2020-01-29T00:00:00", "2020-01-30T00:00:00", "2020-01-31T00:00:00")
+
+coed_february <- c("2020-02-01T00:00:00", "2020-02-02T00:00:00", "2020-02-03T00:00:00", "2020-02-04T00:00:00", "2020-02-05T00:00:00", "2020-02-06T00:00:00", "2020-02-07T00:00:00", "2020-02-08T00:00:00", "2020-02-09T00:00:00", "2020-02-10T00:00:00", "2020-02-11T00:00:00", "2020-02-12T00:00:00", "2020-02-13T00:00:00", "2020-02-14T00:00:00", "2020-02-15T00:00:00", "2020-02-16T00:00:00", "2020-02-17T00:00:00", "2020-02-18T00:00:00", "2020-02-19T00:00:00", "2020-02-20T00:00:00", "2020-02-21T00:00:00", "2020-02-22T00:00:00", "2020-02-23T00:00:00", "2020-02-24T00:00:00", "2020-02-25T00:00:00", "2020-02-26T00:00:00", "2020-02-27T00:00:00", "2020-02-28T00:00:00", "2020-02-29T00:00:00")
+
+coed_march <- c("2020-03-01T00:00:00", "2020-03-02T00:00:00", "2020-03-03T00:00:00", "2020-03-04T00:00:00", "2020-03-05T00:00:00", "2020-03-06T00:00:00", "2020-03-07T00:00:00", "2020-03-08T00:00:00", "2020-03-09T00:00:00", "2020-03-10T00:00:00", "2020-03-11T00:00:00", "2020-03-12T00:00:00", "2020-03-13T00:00:00", "2020-03-14T00:00:00", "2020-03-15T00:00:00", "2020-03-16T00:00:00", "2020-03-17T00:00:00", "2020-03-18T00:00:00", "2020-03-19T00:00:00", "2020-03-20T00:00:00", "2020-03-21T00:00:00", "2020-03-22T00:00:00", "2020-03-23T00:00:00", "2020-03-24T00:00:00", "2020-03-25T00:00:00", "2020-03-26T00:00:00", "2020-03-27T00:00:00", "2020-03-28T00:00:00", "2020-03-29T00:00:00", "2020-03-30T00:00:00", "2020-03-31T00:00:00")
+
+coed_april <- c("2020-04-01T00:00:00", "2020-04-02T00:00:00", "2020-04-03T00:00:00", "2020-04-04T00:00:00", "2020-04-05T00:00:00", "2020-04-06T00:00:00", "2020-04-07T00:00:00", "2020-04-08T00:00:00", "2020-04-09T00:00:00", "2020-04-10T00:00:00", "2020-04-11T00:00:00", "2020-04-12T00:00:00", "2020-04-13T00:00:00", "2020-04-14T00:00:00", "2020-04-15T00:00:00", "2020-04-16T00:00:00", "2020-04-17T00:00:00", "2020-04-18T00:00:00", "2020-04-19T00:00:00", "2020-04-20T00:00:00", "2020-04-21T00:00:00", "2020-04-22T00:00:00", "2020-04-23T00:00:00", "2020-04-24T00:00:00", "2020-04-25T00:00:00", "2020-04-26T00:00:00", "2020-04-27T00:00:00", "2020-04-28T00:00:00", "2020-04-29T00:00:00", "2020-04-30T00:00:00")
+
+coed_may <- c("2020-05-01T00:00:00", "2020-05-02T00:00:00", "2020-05-03T00:00:00", "2020-05-04T00:00:00", "2020-05-05T00:00:00", "2020-05-06T00:00:00", "2020-05-07T00:00:00", "2020-05-08T00:00:00", "2020-05-09T00:00:00", "2020-05-10T00:00:00", "2020-05-11T00:00:00", "2020-05-12T00:00:00", "2020-05-13T00:00:00", "2020-05-14T00:00:00", "2020-05-15T00:00:00", "2020-05-16T00:00:00", "2020-05-17T00:00:00", "2020-05-18T00:00:00", "2020-05-19T00:00:00", "2020-05-20T00:00:00", "2020-05-21T00:00:00", "2020-05-22T00:00:00", "2020-05-23T00:00:00", "2020-05-24T00:00:00", "2020-05-25T00:00:00", "2020-05-26T00:00:00", "2020-05-27T00:00:00", "2020-05-28T00:00:00", "2020-05-29T00:00:00", "2020-05-30T00:00:00", "2020-05-31T00:00:00")
+
+coed_june <- c("2020-06-01T00:00:00", "2020-06-02T00:00:00", "2020-06-03T00:00:00", "2020-06-04T00:00:00", "2020-06-05T00:00:00", "2020-06-06T00:00:00", "2020-06-07T00:00:00", "2020-06-08T00:00:00")
+
+# Filters the data by Occupancy Date
+coed_Jan_shelter <- shelterByCoed %>%
+  filter(as.character(OCCUPANCY_DATE) %in% coed_january)
+
+coed_Feb_shelter <- shelterByCoed %>%
+  filter(as.character(OCCUPANCY_DATE) %in% coed_february)
+
+Coed_March_shelter <- shelterByCoed %>%
+  filter(as.character(OCCUPANCY_DATE) %in% coed_march)
+
+Coed_April_shelter <- shelterByCoed %>%
+  filter(as.character(OCCUPANCY_DATE) %in% coed_april)
+
+Coed_May_shelter <- shelterByCoed %>%
+  filter(as.character(OCCUPANCY_DATE) %in% coed_may)
+
+Coed_June_shelter <- shelterByCoed %>%
+  filter(as.character(OCCUPANCY_DATE) %in% men_june)
+
+
+
+#gg-plots on a month by month basis:
+coed_Jan_shelter %>%
+  ggplot(aes(x = OCCUPANCY_DATE, y = OCCUPANCY, color = SHELTER_NAME)) + facet_wrap(SHELTER_CITY~ORGANIZATION_NAME) + geom_point() + theme(axis.text.x=element_blank(), axis.ticks.x=element_blank()) 
+
+coed_Feb_shelter %>%
+  ggplot(aes(x = OCCUPANCY_DATE, y = OCCUPANCY, color = SHELTER_NAME)) + facet_wrap(SHELTER_CITY~ORGANIZATION_NAME) + geom_point() + theme(axis.text.x=element_blank(), axis.ticks.x=element_blank()) 
+
+coed_March_shelter %>%
+  ggplot(aes(x = OCCUPANCY_DATE, y = OCCUPANCY, color = SHELTER_NAME)) + facet_wrap(SHELTER_CITY~ORGANIZATION_NAME) + geom_point() + theme(axis.text.x=element_blank(), axis.ticks.x=element_blank()) 
+
+coed_April_shelter %>%
+  ggplot(aes(x = OCCUPANCY_DATE, y = OCCUPANCY, color = SHELTER_NAME)) + facet_wrap(SHELTER_CITY~ORGANIZATION_NAME) + geom_point() + theme(axis.text.x=element_blank(), axis.ticks.x=element_blank()) 
+
+coed_May_shelter %>%
+  ggplot(aes(x = OCCUPANCY_DATE, y = OCCUPANCY, color = SHELTER_NAME)) + facet_wrap(SHELTER_CITY~ORGANIZATION_NAME) + geom_point() + theme(axis.text.x=element_blank(), axis.ticks.x=element_blank()) 
+
+coed_June_shelter %>%
+  ggplot(aes(x = OCCUPANCY_DATE, y = OCCUPANCY, color = SHELTER_NAME)) + facet_wrap(SHELTER_CITY~ORGANIZATION_NAME) + geom_point() + theme(axis.text.x=element_blank(), axis.ticks.x=element_blank())
+```
+
+
+
+=======
+>>>>>>> 29f7a30b8436551810888cc216cceb73f652f444
