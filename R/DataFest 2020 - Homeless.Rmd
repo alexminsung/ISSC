@@ -57,6 +57,18 @@ shelterData %>%
   filter(as.character(SECTOR) == "Women") %>%
   summarise(n())
 
+shelterData %>%
+  filter(as.character(SECTOR) == "Women") %>%
+  summarise(n())
+
+shelterData %>%
+  filter(as.character(SECTOR) == "Women") %>%
+  summarise(n())
+
+shelterData %>%
+  filter(as.character(SECTOR) == "Women") %>%
+  summarise(n())
+
 
 # shelterData %>%
 #   filter(as.character(SECTOR) == "Co-ed" & as.character(OCCUPANCY_DATE) > "2020-03-01T00:00:00") %>%
@@ -78,7 +90,10 @@ shelterData %>%
   mutate(relaFreq = OCCUPANCY/CAPACITY) %>%
   ggplot(aes(x = OCCUPANCY_DATE, y = relaFreq, color = SHELTER_NAME)) + facet_wrap(SHELTER_CITY~ORGANIZATION_NAME) + geom_point() + theme(axis.text.x=element_blank(), axis.ticks.x=element_blank()) 
 
-
+shelterData %>%
+  filter(as.character(SECTOR) == "Families" & as.character(OCCUPANCY_DATE) > "2020-03-01T00:00:00") %>%
+  mutate(relaFreq = OCCUPANCY/CAPACITY) %>%
+  ggplot(aes(x = OCCUPANCY_DATE, y = relaFreq, color = SHELTER_NAME)) + facet_wrap(SHELTER_CITY~ORGANIZATION_NAME) + geom_point() + theme(axis.text.x=element_blank(), axis.ticks.x=element_blank()) 
 
 # shelterData %>%
 #   filter(as.character(SECTOR) == "Youth" & as.character(OCCUPANCY_DATE) > "2020-03-01T00:00:00") %>%
@@ -114,24 +129,35 @@ The spread characteristic of the virus could be another factor which possibly ex
 
 shelterDataSub <- shelterData %>%
   mutate(relaFreq = OCCUPANCY/CAPACITY) %>%
-  filter(as.character(SECTOR) == "Women" | as.character(SECTOR) == "Men" &
-           as.character(OCCUPANCY_DATE) > "2020-03-01T00:00:00") %>%
-  select(OCCUPANCY_DATE, SECTOR, CAPACITY, OCCUPANCY, SHELTER_CITY, relaFreq)
+  filter(as.character(OCCUPANCY_DATE) > "2020-03-17T00:00:00") #& as.character(SECTOR) == "Women" | as.character(SECTOR) == "Men") 
+
 # removes all NaNs caused by zero capacity values 
 shelterDataSub <- shelterDataSub[!(shelterDataSub$CAPACITY == 0), ] 
-
-
-
-shelterModel <- glm(as.factor(relaFreq) ~ SECTOR + SHELTER_CITY, 
-                 data=shelterDataSub, family=binomial(link='logit'))
+shelterModel <- glm(relaFreq ~ SECTOR + ORGANIZATION_NAME, 
+                 data=shelterDataSub, family=binomial)
 
 knitr::kable(summary(shelterModel)$coef, digits=3)
 
 logOdds <- cbind(est = shelterModel$coef, confint(shelterModel, level = 0.95))
 odds <- exp(logOdds)
 odds[1,] <- odds[1,] / (1+odds[1,])
-rownames(odds)[1] = 'Baseline prob'
+
 
 knitr::kable(odds, digits=3)
+
+summary(shelterModel)
+
+
+shelterModel2 <- glm(OCCUPANCY ~ SECTOR + CAPACITY+SHELTER_CITY, data = shelterDataSub, family = poisson(link = "log"))
+
+summary(shelterModel2)
+
+```
+
+```{r echo = FALSE}
+#install.packages("gamm4")
+library(gamm4)
+time <- as.character(shelterDataSub$OCCUPANCY_DATE)
+gamm4(relaFreq ~ SECTOR + SHELTER_CITY + s(OCCUPANCY_DATE), data=shelterDataSub, family=binomial(link='logit'))
 
 ```
