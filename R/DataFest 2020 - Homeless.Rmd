@@ -119,56 +119,6 @@ The spread characteristic of the virus could be another factor which possibly ex
 <<<<<<< HEAD
 
 
-```{r echo=FALSE}
-
-library(loon)
-library(loon.data)
-#data(shelterData)
-data(igg1)
-summary(igg1)
-summary(shelterData)
-library(loon.ggplot)
-#This is me trying to replicate the results with our dataset
-atom_info <- with(shelterData,
-                  paste0(OCCUPANCY_DATE, "_", name, "\n",
-                         "CAPACITY", Capacity, "\n",
-                         "SECTOR", Sector, "\n",
-                         "X_id", ID)
-)
-
-
-#This is me trying to replicate the results with our dataset
-atom_info <- with(shelterData,
-                  paste0(OCCUPANCY_DATE, "\n",
-                         "CAPACITY", Capacity, "\n",
-                         "SECTOR", Sector, "\n",
-                         "X_id", ID)
-)
-
-
-#THIS IS THE CODE I was trying from
-atom_info <- with(igg1,
-                  paste0(recordType, ": ",  name, "\n",        # Note newline characters
-                         "Residue: ", residue, "\n",
-                         "Residue Name: ", residueName, "\n",
-                         "Group: ", group, "\n",
-                         "Chain ID: ",  chainID)
-)
-
-
-#This was me messing aruond with the code
-p3d <- with(igg1,
-            l_plot3D(x = x, y = y, z = z,
-                     # Rest of arguments are as in l_plot()
-                     itemLabel = atom_info,
-                     showItemLabels = FALSE,  # <- show tool tips?
-                     showLabels = TRUE,       # <- show axis labels and title?
-                     showGuides = TRUE,   
-                     linkingGroup = "igg1",
-                     title = "human IgG1 molecule")
-)
-```
-
 
 "hello"
 
