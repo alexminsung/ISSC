@@ -18,8 +18,8 @@ library(ggplot2)
 shelterData <- read.csv("https://raw.githubusercontent.com/alexminsung/ISSC/master/data/Daily%20shelter%20occpancy%20current.csv?token=APUVSRCQBS7QDHDGTMGCLMS65JGQU")
 attach(shelterData)
 
-shelterData %>% 
-  distinct(SHELTER_NAME)
+# shelterData %>% 
+#   distinct(SHELTER_NAME)
 
 # Finds all rows that starts witih "HFS"
 HFS <- grep("^HFS", as.character(shelterData$SHELTER_NAME), value = TRUE)
@@ -31,9 +31,6 @@ target <- c("COSTI Reception Centre", "Seaton House", HFS, "Salvation Army - Max
 # Filters the data by reported Covid19 cases
 shelterByCovid <- shelterData %>%
   filter(as.character(SHELTER_NAME) %in% target)
-  
-
-
 
 ```
 
@@ -51,10 +48,23 @@ Qs: The effects of covid19 on homeless shelters/homeless?
 #I have separated the data by sector as you suggested but even then the points are very messy. If you can think of a way to 
 # improve this, then go ahead
 
+
 # from this we can see that men and women make up most of the data (maybe we can exclude the rest?)
+cityOfToronto <- shelterData %>%
+  filter(as.character(SECTOR) == "Men" & as.character(ORGANIZATION_NAME) == "City of Toronto" & as.character(OCCUPANCY_DATE) > "2020-03-01T00:00:00") %>%
+  
 shelterData %>%
-  filter(as.character(SECTOR) == "Men") %>%
+  filter(as.character(SECTOR) == "Women") %>%
   summarise(n())
+
+shelterData %>%
+  filter(as.character(SECTOR) == "Women") %>%
+  summarise(n())
+
+shelterData %>%
+  filter(as.character(SECTOR) == "Women") %>%
+  summarise(n())
+
 shelterData %>%
   filter(as.character(SECTOR) == "Women") %>%
   summarise(n())
@@ -72,13 +82,18 @@ shelterData %>%
 
 shelterData %>%
   filter(as.character(SECTOR) == "Women" & as.character(OCCUPANCY_DATE) > "2020-03-01T00:00:00") %>%
-  ggplot(aes(x = OCCUPANCY_DATE, y = OCCUPANCY, color = SHELTER_NAME)) + facet_wrap(SHELTER_CITY~ORGANIZATION_NAME) +   geom_point() + theme(axis.text.x=element_blank(), axis.ticks.x=element_blank())
-
+  mutate(relaFreq = OCCUPANCY/CAPACITY) %>%
+  ggplot(aes(x = OCCUPANCY_DATE, y = relaFreq, color = SHELTER_NAME)) + facet_wrap(SHELTER_CITY~ORGANIZATION_NAME) + geom_point() + theme(axis.text.x=element_blank(), axis.ticks.x=element_blank()) 
 
 shelterData %>%
   filter(as.character(SECTOR) == "Men" & as.character(OCCUPANCY_DATE) > "2020-03-01T00:00:00") %>%
-  ggplot(aes(x = OCCUPANCY_DATE, y = OCCUPANCY, color = SHELTER_NAME)) + facet_wrap(SHELTER_CITY~ORGANIZATION_NAME) +   geom_point() + theme(axis.text.x=element_blank(), axis.ticks.x=element_blank())
+  mutate(relaFreq = OCCUPANCY/CAPACITY) %>%
+  ggplot(aes(x = OCCUPANCY_DATE, y = relaFreq, color = SHELTER_NAME)) + facet_wrap(SHELTER_CITY~ORGANIZATION_NAME) + geom_point() + theme(axis.text.x=element_blank(), axis.ticks.x=element_blank()) 
 
+shelterData %>%
+  filter(as.character(SECTOR) == "Families" & as.character(OCCUPANCY_DATE) > "2020-03-01T00:00:00") %>%
+  mutate(relaFreq = OCCUPANCY/CAPACITY) %>%
+  ggplot(aes(x = OCCUPANCY_DATE, y = relaFreq, color = SHELTER_NAME)) + facet_wrap(SHELTER_CITY~ORGANIZATION_NAME) + geom_point() + theme(axis.text.x=element_blank(), axis.ticks.x=element_blank()) 
 
 # shelterData %>%
 #   filter(as.character(SECTOR) == "Youth" & as.character(OCCUPANCY_DATE) > "2020-03-01T00:00:00") %>%
@@ -95,12 +110,80 @@ shelterByCovid %>%
   mutate(log_occupancy = log(OCCUPANCY)) %>%
   ggplot(aes(x = OCCUPANCY_DATE, y = OCCUPANCY, color = SHELTER_NAME)) + geom_point() + 
   facet_wrap(~ORGANIZATION_NAME) +
-  geom_vline(aes(xintercept = which(levels(OCCUPANCY_DATE) %in% '2020-05-22T00:00:00')), color="black", linetype="dashed") + 
+  geom_vline(aes(xintercept = '2020-04-09T00:00:00'), color="black", linetype="dashed") + 
+  geom_vline(aes(xintercept = '2020-03-17T00:00:00'), color="red", linetype="dashed") +
   #theme(axis.text.x=element_blank(), axis.ticks.x=element_blank()) 
   theme(axis.text.x = element_text(angle=90, hjust=0))
 
 ```
 
+Unlike our previous hypothesis, comparing the occupancy of Women shelters around Scarborough and Toronto have shown either a general decrease in numbers or minimal changes at best. Only one stands as an exception to this, which is the Home First Society Women's sector, where there have been a slight increase in numbers ever since Toronto's lock-down on March 17  (indicated by a red line). However, even this facility shows to illustrate a much steeper decrease around April 21st. 
+
+I believe that this sudden decrease is likely contributed by the emergence of mass infections which occurred at the Homes First Shelter - Willowdale Welcome Center on the 9th of April. Considered as the "largest COVID-19 outbreak in the city's shelter system" by Toronto Star (https://www.thestar.com/news/gta/2020/05/24/how-a-haven-for-refugees-became-home-to-the-worst-covid-19-outbreak-in-torontos-shelter-system.html), it is no doubt that this foreboding news caught the attention of many residents in other shelters. While without solid evidence, I believe such news could have instilled fears among the residents in other Home First Society affiliated shelters, possibly providing a sufficient explanation in the sudden dip in occpancy. 
 
 
-"hello"
+The spread characteristic of the virus could be another factor which possibly explains the decrease/little change in occupancy in shelters. As the virus is infamous for being easily contagious, it is possible that those without homes may have preferred to stay isolated from places with large crowds (i.e. shelters). This hypothesis is supported by the steadily declining numbers in occupancy at many shelters ever since COVID-19 was declared a pandemic. 
+
+
+```{r echo = FALSE}
+
+install.packages("lmtest")
+library(lmtest)
+
+shelterDataSub <- shelterData %>%
+  mutate(relaFreq = OCCUPANCY/CAPACITY) %>%
+  filter(as.character(OCCUPANCY_DATE) > "2020-03-17T00:00:00") #& as.character(SECTOR) == "Women" | as.character(SECTOR) == "Men") 
+
+# removes all NaNs caused by zero capacity values 
+shelterDataSub <- shelterDataSub[!(shelterDataSub$CAPACITY == 0), ] 
+# shelterModel <- glm(relaFreq ~ SECTOR + ORGANIZATION_NAME, 
+#                  data=shelterDataSub, family=binomial)
+# 
+# knitr::kable(summary(shelterModel)$coef, digits=3)
+# 
+# logOdds <- cbind(est = shelterModel$coef, confint(shelterModel, level = 0.95))
+# odds <- exp(logOdds)
+# odds[1,] <- odds[1,] / (1+odds[1,])
+# 
+# 
+# knitr::kable(odds, digits=3)
+# 
+# summary(shelterModel)
+
+shelterModel2 <- glm(OCCUPANCY ~ SECTOR + CAPACITY + SHELTER_CITY, data = shelterDataSub, family = poisson(link = "log"))
+
+logRate <- cbind(est=shelterModel2$coef, confint(shelterModel2, level=0.99))
+
+summary(shelterModel2)
+knitr::kable(cbind(summary(shelterModel2)$coef,exp(logRate)),digits=3)
+
+shelterDataSub$SECTOR <- factor(shelterDataSub$SECTOR, ordered = FALSE)
+shelterDataSub$SHELTER_CITY <- factor(shelterDataSub$SHELTER_CITY, ordered = FALSE)
+
+# need a better criteria for selecting a baseline
+shelterDataSub$category <- relevel(shelterDataSub$SECTOR, 'Men')
+shelterDataSub$city <- relevel(shelterDataSub$SHELTER_CITY, 'Toronto')
+shelterModel3 <- glm(OCCUPANCY ~ sectorCat + CAPACITY*city, data = shelterDataSub, family = poisson(link = "log"))
+logRate2 <- cbind(est=shelterModel3$coef, confint(shelterModel3, level=0.99))
+knitr::kable(cbind(summary(shelterModel3)$coef,exp(logRate2)),digits=3)
+
+lmtest::lrtest(shelterModel2, shelterModel3)
+
+```
+The generalised linear model follows a Poisson regression with a log link, where the response represents the number of homeless clients in a shelter on that day.
+The covariates in the model are: SECTOR (categorization of the type of residents from "Men", "Women", "Families", "Co-ed" and "Youth"), SHELTER_CITY (the city of the shelter locations from "Toronto", "North York", "Scarborough" and "Etobicoke"), and CAPCITY (the maximum number of beds available for the residents). 
+
+The baseline represents the number of male homeless clients who are visiting a Toronto shelter. 
+
+From the table above, we can see that the number of clients who are Co-ed in Toronto shelters are similar to the number of male clients in Toronto shelters (P-value > 0.05).
+
+As seen from a small p-value, it is evident that model including the interaction between capacity and shelter city explains the data significantly more accurately. This is likely the result of some cities, such as Toronto, containing much larger facilities with higher capacity than other cities such as Scarborough and North York. 
+
+```{r echo = FALSE}
+#install.packages("gamm4")
+library(gamm4)
+time <- as.character(shelterDataSub$OCCUPANCY_DATE)
+gamm4(relaFreq ~ SECTOR + SHELTER_CITY + s(OCCUPANCY_DATE), data=shelterDataSub, family=binomial(link='logit'))
+
+
+```
