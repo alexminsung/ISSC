@@ -127,37 +127,63 @@ The spread characteristic of the virus could be another factor which possibly ex
 
 ```{r echo = FALSE}
 
+install.packages("lmtest")
+library(lmtest)
+
 shelterDataSub <- shelterData %>%
   mutate(relaFreq = OCCUPANCY/CAPACITY) %>%
   filter(as.character(OCCUPANCY_DATE) > "2020-03-17T00:00:00") #& as.character(SECTOR) == "Women" | as.character(SECTOR) == "Men") 
 
 # removes all NaNs caused by zero capacity values 
 shelterDataSub <- shelterDataSub[!(shelterDataSub$CAPACITY == 0), ] 
-shelterModel <- glm(relaFreq ~ SECTOR + ORGANIZATION_NAME, 
-                 data=shelterDataSub, family=binomial)
+# shelterModel <- glm(relaFreq ~ SECTOR + ORGANIZATION_NAME, 
+#                  data=shelterDataSub, family=binomial)
+# 
+# knitr::kable(summary(shelterModel)$coef, digits=3)
+# 
+# logOdds <- cbind(est = shelterModel$coef, confint(shelterModel, level = 0.95))
+# odds <- exp(logOdds)
+# odds[1,] <- odds[1,] / (1+odds[1,])
+# 
+# 
+# knitr::kable(odds, digits=3)
+# 
+# summary(shelterModel)
 
-knitr::kable(summary(shelterModel)$coef, digits=3)
+shelterModel2 <- glm(OCCUPANCY ~ SECTOR + CAPACITY + SHELTER_CITY, data = shelterDataSub, family = poisson(link = "log"))
 
-logOdds <- cbind(est = shelterModel$coef, confint(shelterModel, level = 0.95))
-odds <- exp(logOdds)
-odds[1,] <- odds[1,] / (1+odds[1,])
-
-
-knitr::kable(odds, digits=3)
-
-summary(shelterModel)
-
-
-shelterModel2 <- glm(OCCUPANCY ~ SECTOR + CAPACITY+SHELTER_CITY, data = shelterDataSub, family = poisson(link = "log"))
+logRate <- cbind(est=shelterModel2$coef, confint(shelterModel2, level=0.99))
 
 summary(shelterModel2)
+knitr::kable(cbind(summary(shelterModel2)$coef,exp(logRate)),digits=3)
+
+shelterDataSub$SECTOR <- factor(shelterDataSub$SECTOR, ordered = FALSE)
+shelterDataSub$SHELTER_CITY <- factor(shelterDataSub$SHELTER_CITY, ordered = FALSE)
+
+# need a better criteria for selecting a baseline
+shelterDataSub$category <- relevel(shelterDataSub$SECTOR, 'Men')
+shelterDataSub$city <- relevel(shelterDataSub$SHELTER_CITY, 'Toronto')
+shelterModel3 <- glm(OCCUPANCY ~ sectorCat + CAPACITY*city, data = shelterDataSub, family = poisson(link = "log"))
+logRate2 <- cbind(est=shelterModel3$coef, confint(shelterModel3, level=0.99))
+knitr::kable(cbind(summary(shelterModel3)$coef,exp(logRate2)),digits=3)
+
+lmtest::lrtest(shelterModel2, shelterModel3)
 
 ```
+The generalised linear model follows a Poisson regression with a log link, where the response represents the number of homeless clients in a shelter on that day.
+The covariates in the model are: SECTOR (categorization of the type of residents from "Men", "Women", "Families", "Co-ed" and "Youth"), SHELTER_CITY (the city of the shelter locations from "Toronto", "North York", "Scarborough" and "Etobicoke"), and CAPCITY (the maximum number of beds available for the residents). 
+
+The baseline represents the number of male homeless clients who are visiting a Toronto shelter. 
+
+From the table above, we can see that the number of clients who are Co-ed in Toronto shelters are similar to the number of male clients in Toronto shelters (P-value > 0.05).
+
+As seen from a small p-value, it is evident that model including the interaction between capacity and shelter city explains the data significantly more accurately. This is likely the result of some cities, such as Toronto, containing much larger facilities with higher capacity than other cities such as Scarborough and North York. 
 
 ```{r echo = FALSE}
 #install.packages("gamm4")
 library(gamm4)
 time <- as.character(shelterDataSub$OCCUPANCY_DATE)
 gamm4(relaFreq ~ SECTOR + SHELTER_CITY + s(OCCUPANCY_DATE), data=shelterDataSub, family=binomial(link='logit'))
+
 
 ```
