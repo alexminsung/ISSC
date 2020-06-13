@@ -13,6 +13,7 @@ library(shiny)
 library(shinydashboard)
 library(tidyverse)
 library(ggplot2)
+library(dplyr)
 
 #Reading the csv
 shelterData <- read.csv("https://raw.githubusercontent.com/alexminsung/ISSC/master/data/Daily%20shelter%20occpancy%20current.csv?token=APUVSRCQBS7QDHDGTMGCLMS65JGQU")
@@ -115,29 +116,13 @@ I believe that this sudden decrease is likely contributed by the emergence of ma
 
 The spread characteristic of the virus could be another factor which possibly explains the decrease/little change in occupancy in shelters. As the virus is infamous for being easily contagious, it is possible that those without homes may have preferred to stay isolated from places with large crowds (i.e. shelters). This hypothesis is supported by the steadily declining numbers in occupancy at many shelters ever since COVID-19 was declared a pandemic. 
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-
-
-
-"hello"
 
 
 
 
 ```{r echo=FALSE}
-#TRYING MY STUFF OUT TO DETERMINE A LINEAR REGRESSION MODEL
-
-#First get an unfiltered view of the raw data:
+#SLR Model:
 attach(shelterData)
-view(shelterData)
-
-#The PURPOSE of this report is to see whether there is a change in the number Occupancy.
-# $H_{0}$: There is no significant change in the occupancy after the lockdown in Toronto (i.e. March 17)
-# $H_{1}$: There is a significant change in the occupancy after the lockdown in Toronto
-#We will be using a significance level of 5% (i.e. 0.05) (Do you think 5% is reasonable?)
-
-#QUESTION FOR ALEX: SHOULD WE CHANGE THE DATE OF THE LOCKDOWN FROM MARCH 17TH TO MARCH 24TH OR MARCH 30TH?????
 
 boxplot(OCCUPANCY, main = "9839 Boxplot Boxplot", ylab = "Occupancy Number")
 #From this plot it can be seen that the data is very volatile, beacuse there is a significant portion of the data outside of the whiskers
@@ -145,22 +130,16 @@ boxplot(OCCUPANCY, main = "9839 Boxplot Boxplot", ylab = "Occupancy Number")
 shelterData %>%
   ggplot(aes(x = OCCUPANCY_DATE, y = OCCUPANCY)) + geom_point()
 
-#Find a way to include Shape, and color for this gg-plot (Notice: that it should be shape = SHELTER_NAME)
-
-#It can be noticed through the gg-plot that two shelters had a dramtic decrease in Occupancy as time progressed. While the other shelters either decreased a little bit as time progressed or increased a little bit as time progressed or basically stated the same.
-
-#We are now going to create a regression line with occupancy on the y-axis and occupancy date on the x-axis to see if the data behaves normally
-#shelterData %>%
 qqnorm(shelterData$OCCUPANCY, ylab = "Occupancy", main = "Hello")
 qqline(shelterData$OCCUPANCY)
+#From the graph it can be seen that the response variable does not follow a normal distribution, because the regression line doesn't fully encasuplate majority of the data points.
 
-#From the graph it can be seen that this variable is not normal, because it does not closely follow the regression line.
 
 #Applying a log transformation to the Response Variable Occupancy:
-OCCUPANCY <- as.numeric(OCCUPANCY)
+#OCCUPANCY <- as.numeric(OCCUPANCY)
 #Problem when converting values from 0 to lo10(0), because log10(0) give negative infintity
-qqnorm(log10(shelterData$OCCUPANCY), cex=0.5, ylab = "Log to base 10 of Sale Price", main = "9839")
-qqline(log10(shelterData$OCCUPANCY))
+#qqnorm(log10(shelterData$OCCUPANCY), cex=0.5, ylab = "Log to base 10 of Sale Price", main = "9839")
+#qqline(log10(shelterData$OCCUPANCY))
 
 
 
@@ -168,11 +147,7 @@ qqline(log10(shelterData$OCCUPANCY))
 #APPLYING A SQRT transformation to the response variable
 qqnorm(sqrt(shelterData$OCCUPANCY), cex=0.5, ylab = "Square Root of Occupancy", main = "9839 Sqrt")
 qqline(sqrt(shelterData$OCCUPANCY))
-
-
-#Applying an inverse transformation to the response variable
-qqnorm((1 / (shelterData$OCCUPANCY)), cex=0.5, ylab = "Inverse of Occupancy", main = "9839 INverse")
-qqline(1 /(shelterData$OCCUPANCY))
+#From this graph it can also be seen that the response variable "OCCUPANCY", does not follow a normal distribution, because the data does not closely follow the regression line.
 ```
 
 
@@ -403,16 +378,16 @@ coed_Jan_shelter %>%
 coed_Feb_shelter %>%
   ggplot(aes(x = OCCUPANCY_DATE, y = OCCUPANCY, color = SHELTER_NAME)) + facet_wrap(SHELTER_CITY~ORGANIZATION_NAME) + geom_point() + theme(axis.text.x=element_blank(), axis.ticks.x=element_blank()) 
 
-coed_March_shelter %>%
+Coed_March_shelter %>%
   ggplot(aes(x = OCCUPANCY_DATE, y = OCCUPANCY, color = SHELTER_NAME)) + facet_wrap(SHELTER_CITY~ORGANIZATION_NAME) + geom_point() + theme(axis.text.x=element_blank(), axis.ticks.x=element_blank()) 
 
-coed_April_shelter %>%
+Coed_April_shelter %>%
   ggplot(aes(x = OCCUPANCY_DATE, y = OCCUPANCY, color = SHELTER_NAME)) + facet_wrap(SHELTER_CITY~ORGANIZATION_NAME) + geom_point() + theme(axis.text.x=element_blank(), axis.ticks.x=element_blank()) 
 
-coed_May_shelter %>%
+Coed_May_shelter %>%
   ggplot(aes(x = OCCUPANCY_DATE, y = OCCUPANCY, color = SHELTER_NAME)) + facet_wrap(SHELTER_CITY~ORGANIZATION_NAME) + geom_point() + theme(axis.text.x=element_blank(), axis.ticks.x=element_blank()) 
 
-coed_June_shelter %>%
+Coed_June_shelter %>%
   ggplot(aes(x = OCCUPANCY_DATE, y = OCCUPANCY, color = SHELTER_NAME)) + facet_wrap(SHELTER_CITY~ORGANIZATION_NAME) + geom_point() + theme(axis.text.x=element_blank(), axis.ticks.x=element_blank())
 
 ### Now Families for a month by month basis:
@@ -527,12 +502,10 @@ youth_June_shelter %>%
 
 
 
-=======
->>>>>>> 29f7a30b8436551810888cc216cceb73f652f444
-=======
+
 
 ```{r echo = FALSE}
-
+#STUFF ALEX SENT THROUGHT GITHUB
 shelterDataSub <- shelterData %>%
   mutate(relaFreq = OCCUPANCY/CAPACITY) %>%
   filter(as.character(SECTOR) == "Women" | as.character(SECTOR) == "Men" &
@@ -545,6 +518,7 @@ shelterDataSub <- shelterDataSub[!(shelterDataSub$CAPACITY == 0), ]
 
 shelterModel <- glm(as.factor(relaFreq) ~ SECTOR + SHELTER_CITY, 
                  data=shelterDataSub, family=binomial(link='logit'))
+summary(shelterModel)
 
 knitr::kable(summary(shelterModel)$coef, digits=3)
 
@@ -555,5 +529,43 @@ rownames(odds)[1] = 'Baseline prob'
 
 knitr::kable(odds, digits=3)
 
+
 ```
->>>>>>> 6185633288b80224abd33df34d7366ed0e282b94
+
+
+
+
+```{r echo=FALSE}
+#STUFF ALEX SENT ME THROUGH FB:
+shelterDataSub <- shelterData %>%
+  mutate(relaFreq = OCCUPANCY/CAPACITY) %>%
+  filter(as.character(OCCUPANCY_DATE) > "2020-03-17T00:00:00") #& as.character(SECTOR) == "Women" | as.character(SECTOR) == "Men") 
+# removes all NaNs caused by zero capacity values 
+shelterDataSub <- shelterDataSub[!(shelterDataSub$CAPACITY == 0), ] 
+#Commented out your model below, beacuse I believe its not the one we want.
+#shelterModel <- glm(relaFreq ~ SECTOR + ORGANIZATION_NAME, 
+                 #data=shelterDataSub, family=binomial)
+knitr::kable(summary(shelterModel)$coef, digits=3)
+logOdds <- cbind(est = shelterModel$coef, confint(shelterModel, level = 0.95))
+odds <- exp(logOdds)
+odds[1,] <- odds[1,] / (1+odds[1,])
+knitr::kable(odds, digits=3)
+summary(shelterModel)
+#Below is the model I believe we want
+shelterModel2 <- glm(OCCUPANCY ~ SECTOR + CAPACITY+SHELTER_CITY, data = shelterDataSub, family = poisson(link = "log"))
+summary(shelterModel2)
+#My Work:
+#Question: What Covariates do I want to add onto Alex's model? Play around with them a bit and see what significant values I get. This I will be able to determine from the p-values (the smaller they are the better). Next I will want to be able to interrupt the data. Most importantly, be able to determine what the intercept and coefficients tell us. Then I will want to determine a confidence interval both around the model, and the response variable (I think?). Look at past 302 notes to see where I did the confidence intervals around. KEEP IN MIND WE ARE DEALING WITH COUNT NOW, AND NO LONGER FREQUENCY!
+
+#the POSSIBLE covariates are: "X_id", "OCCUPANCY_DATE", "SECTOR", "SHELTER_POSTAL_CODE", "CAPACITY", "SHELTER_PROVINCE", "FACILITY_NAME", "SHELTER_NAME", "OCCUPANCY", "ORGANIZATION_NAME", "SHELTER_ADDRESS", "SHELTER_CITY", "PROGRAM_NAME", "id", "DateRange", "relaFreq"
+
+#Looking at the summary of shelterModel2 it can be seen that both the covariate Sector, Capacity and Shelter Location are important, because they have VERY small p-values.
+
+#Me Playing Around With Different Models:
+shelterModel2_mine <- glm(OCCUPANCY ~ SECTOR + CAPACITY + SHELTER_CITY + CAPACITY*SHELTER_CITY, data = shelterDataSub, family = poisson(link = "log"))
+#When this interactive variable is added in (i.e CAPACITY*SHELTER_CITY), the sector: men no longer becomes significant (i.e it has a p-values of 0.11)
+summary(shelterModel2_mine)
+```
+
+
+
