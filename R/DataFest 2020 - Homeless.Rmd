@@ -539,8 +539,8 @@ knitr::kable(odds, digits=3)
 #STUFF ALEX SENT ME THROUGH FB:
 shelterDataSub <- shelterData %>%
   mutate(relaFreq = OCCUPANCY/CAPACITY) %>%
-  filter(as.character(OCCUPANCY_DATE) > "2020-03-17T00:00:00") #& as.character(SECTOR) == "Women" | as.character(SECTOR) == "Men") 
-# removes all NaNs caused by zero capacity values 
+  filter(as.character(OCCUPANCY_DATE) > "2020-03-17T00:00:00") #& as.character(SECTOR) == "Women" | as.character(SECTOR) == "Men" | as.character(SECTOR) == "Co-ed" | as.character(SECTOR) == "Families" | as.character("Youth"))
+# removes all NaNs caused by zero capacity values (ARE YOU REFERRING TO THE #&????)
 shelterDataSub <- shelterDataSub[!(shelterDataSub$CAPACITY == 0), ] 
 #Commented out your model below, beacuse I believe its not the one we want.
 #shelterModel <- glm(relaFreq ~ SECTOR + ORGANIZATION_NAME, 
@@ -556,6 +556,9 @@ shelterModel2 <- glm(OCCUPANCY ~ SECTOR + CAPACITY+SHELTER_CITY, data = shelterD
 summary(shelterModel2)
 #My Work:
 #Question: What Covariates do I want to add onto Alex's model? Play around with them a bit and see what significant values I get. This I will be able to determine from the p-values (the smaller they are the better). Next I will want to be able to interrupt the data. Most importantly, be able to determine what the intercept and coefficients tell us. Then I will want to determine a confidence interval both around the model, and the response variable (I think?). Look at past 302 notes to see where I did the confidence intervals around. KEEP IN MIND WE ARE DEALING WITH COUNT NOW, AND NO LONGER FREQUENCY!
+
+
+count_shelterdata <- shelterData$SHELTER_CITY
 
 #the POSSIBLE covariates are: "X_id", "OCCUPANCY_DATE", "SECTOR", "SHELTER_POSTAL_CODE", "CAPACITY", "SHELTER_PROVINCE", "FACILITY_NAME", "SHELTER_NAME", "OCCUPANCY", "ORGANIZATION_NAME", "SHELTER_ADDRESS", "SHELTER_CITY", "PROGRAM_NAME", "id", "DateRange", "relaFreq"
 
