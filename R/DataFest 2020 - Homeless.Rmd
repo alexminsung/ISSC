@@ -118,6 +118,7 @@ The spread characteristic of the virus could be another factor which possibly ex
 
 
 
+<<<<<<< HEAD
 
 
 ```{r echo=FALSE}
@@ -506,6 +507,11 @@ youth_June_shelter %>%
 
 ```{r echo = FALSE}
 #STUFF ALEX SENT THROUGHT GITHUB
+=======
+install.packages("lmtest")
+library(lmtest)
+
+>>>>>>> 289b33cdd462585a63f7d4d5133906d9bbc49017
 shelterDataSub <- shelterData %>%
   mutate(relaFreq = OCCUPANCY/CAPACITY) %>%
   filter(as.character(SECTOR) == "Women" | as.character(SECTOR) == "Men" &
@@ -513,22 +519,47 @@ shelterDataSub <- shelterData %>%
   select(OCCUPANCY_DATE, SECTOR, CAPACITY, OCCUPANCY, SHELTER_CITY, relaFreq)
 # removes all NaNs caused by zero capacity values 
 shelterDataSub <- shelterDataSub[!(shelterDataSub$CAPACITY == 0), ] 
+<<<<<<< HEAD
 
 
 
 shelterModel <- glm(as.factor(relaFreq) ~ SECTOR + SHELTER_CITY, 
                  data=shelterDataSub, family=binomial(link='logit'))
 summary(shelterModel)
+=======
+# shelterModel <- glm(relaFreq ~ SECTOR + ORGANIZATION_NAME, 
+#                  data=shelterDataSub, family=binomial)
+# 
+# knitr::kable(summary(shelterModel)$coef, digits=3)
+# 
+# logOdds <- cbind(est = shelterModel$coef, confint(shelterModel, level = 0.95))
+# odds <- exp(logOdds)
+# odds[1,] <- odds[1,] / (1+odds[1,])
+# 
+# 
+# knitr::kable(odds, digits=3)
+# 
+# summary(shelterModel)
+>>>>>>> 289b33cdd462585a63f7d4d5133906d9bbc49017
 
-knitr::kable(summary(shelterModel)$coef, digits=3)
+shelterModel2 <- glm(OCCUPANCY ~ SECTOR + CAPACITY + SHELTER_CITY, data = shelterDataSub, family = poisson(link = "log"))
 
+<<<<<<< HEAD
 logOdds <- cbind(est = shelterModel$coef, confint(shelterModel, level = 0.95))
 odds <- exp(logOdds)
 odds[1,] <- odds[1,] / (1+odds[1,])
 rownames(odds)[1] = 'Baseline prob'
+=======
+logRate <- cbind(est=shelterModel2$coef, confint(shelterModel2, level=0.99))
 
-knitr::kable(odds, digits=3)
+summary(shelterModel2)
+knitr::kable(cbind(summary(shelterModel2)$coef,exp(logRate)),digits=3)
+>>>>>>> 289b33cdd462585a63f7d4d5133906d9bbc49017
 
+shelterDataSub$SECTOR <- factor(shelterDataSub$SECTOR, ordered = FALSE)
+shelterDataSub$SHELTER_CITY <- factor(shelterDataSub$SHELTER_CITY, ordered = FALSE)
+
+<<<<<<< HEAD
 
 ```
 
@@ -569,6 +600,32 @@ shelterModel2_mine <- glm(OCCUPANCY ~ SECTOR + CAPACITY + SHELTER_CITY + CAPACIT
 #When this interactive variable is added in (i.e CAPACITY*SHELTER_CITY), the sector: men no longer becomes significant (i.e it has a p-values of 0.11)
 summary(shelterModel2_mine)
 ```
+=======
+# need a better criteria for selecting a baseline
+shelterDataSub$category <- relevel(shelterDataSub$SECTOR, 'Men')
+shelterDataSub$city <- relevel(shelterDataSub$SHELTER_CITY, 'Toronto')
+# I still think an offset is required to give a proper "rate" value. Possible solution is to divide current occupancy by 
+# previous occupancy to return a percent change in occupancy per day?
+shelterModel3 <- glm(OCCUPANCY ~ sectorCat + CAPACITY*city, data = shelterDataSub, family = poisson(link = "log"))
+logRate2 <- cbind(est=shelterModel3$coef, confint(shelterModel3, level=0.99))
+knitr::kable(cbind(summary(shelterModel3)$coef,exp(logRate2)),digits=3)
+
+lmtest::lrtest(shelterModel2, shelterModel3)
+
+```
+The generalised linear model follows a Poisson regression with a log link, where the response represents the number of homeless clients in a shelter on that day.
+The covariates in the model are: SECTOR (categorization of the type of residents from "Men", "Women", "Families", "Co-ed" and "Youth"), SHELTER_CITY (the city of the shelter locations from "Toronto", "North York", "Scarborough" and "Etobicoke"), and CAPCITY (the maximum number of beds available for the residents). 
+
+The baseline represents the number of male homeless clients who are visiting a Toronto shelter. 
+
+From the table above, we can see that the number of clients who are Co-ed in Toronto shelters are similar to the number of male clients in Toronto shelters (P-value > 0.05).
+
+As seen from a small p-value, it is evident that model including the interaction between capacity and shelter city explains the data significantly more accurately. This is likely the result of some cities, such as Toronto, containing much larger facilities with higher capacity than other cities such as Scarborough and North York. 
+>>>>>>> 289b33cdd462585a63f7d4d5133906d9bbc49017
 
 
 
+<<<<<<< HEAD
+=======
+```
+>>>>>>> 289b33cdd462585a63f7d4d5133906d9bbc49017
