@@ -163,6 +163,8 @@ shelterDataSub$SHELTER_CITY <- factor(shelterDataSub$SHELTER_CITY, ordered = FAL
 # need a better criteria for selecting a baseline
 shelterDataSub$category <- relevel(shelterDataSub$SECTOR, 'Men')
 shelterDataSub$city <- relevel(shelterDataSub$SHELTER_CITY, 'Toronto')
+# I still think an offset is required to give a proper "rate" value. Possible solution is to divide current occupancy by 
+# previous occupancy to return a percent change in occupancy per day?
 shelterModel3 <- glm(OCCUPANCY ~ sectorCat + CAPACITY*city, data = shelterDataSub, family = poisson(link = "log"))
 logRate2 <- cbind(est=shelterModel3$coef, confint(shelterModel3, level=0.99))
 knitr::kable(cbind(summary(shelterModel3)$coef,exp(logRate2)),digits=3)
