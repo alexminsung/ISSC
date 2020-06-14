@@ -54,17 +54,6 @@ Qs: The effects of covid19 on homeless shelters/homeless?
 shelterByMen <- shelterData %>%
   filter(as.character(SECTOR) %in% target_0)
 
-
-
-# from this we can see that men and women make up most of the data (maybe we can exclude the rest?)
-cityOfToronto <- shelterData %>%
-  filter(as.character(SECTOR) == "Men" & as.character(ORGANIZATION_NAME) == "City of Toronto" & as.character(OCCUPANCY_DATE) > "2020-03-01T00:00:00") %>%
-  
-shelterData %>%
-  filter(as.character(SECTOR) == "Women") %>%
-  summarise(n())
-
-
 # shelterData %>%
 #   filter(as.character(SECTOR) == "Co-ed" & as.character(OCCUPANCY_DATE) > "2020-03-01T00:00:00") %>%
 #   ggplot(aes(x = OCCUPANCY_DATE, y = OCCUPANCY, color = SHELTER_NAME)) + facet_wrap(SHELTER_CITY~ORGANIZATION_NAME) +
@@ -73,6 +62,11 @@ shelterData %>%
 # shelterData %>%
 #   filter(as.character(SECTOR) == "Families" & as.character(OCCUPANCY_DATE) > "2020-03-01T00:00:00") %>%
 #   ggplot(aes(x = OCCUPANCY_DATE, y = OCCUPANCY, color = SHELTER_NAME)) + facet_wrap(SHELTER_CITY~ORGANIZATION_NAME) +     geom_point() + theme(axis.text.x=element_blank(), axis.ticks.x=element_blank())
+
+shelterData %>%
+  filter(as.character(SECTOR) == "Co-ed" & as.character(OCCUPANCY_DATE) > "2020-03-01T00:00:00") %>%
+  mutate(relaFreq = OCCUPANCY/CAPACITY) %>%
+  ggplot(aes(x = OCCUPANCY_DATE, y = relaFreq, color = SHELTER_NAME)) + facet_wrap(SHELTER_CITY~ORGANIZATION_NAME) + geom_point() + theme(axis.text.x=element_blank(), axis.ticks.x=element_blank()) 
 
 
 shelterData %>%
@@ -87,12 +81,16 @@ shelterData %>%
 
 
 
-# shelterData %>%
-#   filter(as.character(SECTOR) == "Youth" & as.character(OCCUPANCY_DATE) > "2020-03-01T00:00:00") %>%
-#   ggplot(aes(x = OCCUPANCY_DATE, y = OCCUPANCY, color = SHELTER_NAME)) + facet_wrap(SHELTER_CITY~ORGANIZATION_NAME) +   geom_point() + theme(axis.text.x=element_blank(), axis.ticks.x=element_blank())
+shelterData %>%
+  filter(as.character(SECTOR) == "Youth" & as.character(OCCUPANCY_DATE) > "2020-03-01T00:00:00") %>%
+  mutate(relaFreq = OCCUPANCY/CAPACITY) %>%
+  ggplot(aes(x = OCCUPANCY_DATE, y = relaFreq, color = SHELTER_NAME)) + facet_wrap(SHELTER_CITY~ORGANIZATION_NAME) + geom_point() + theme(axis.text.x=element_blank(), axis.ticks.x=element_blank()) 
 
   
 ```
+
+
+
 
 ```{r echo = FALSE}
 # this is on the side, since i wanted to see if the numbers dropped after a covid19 case was reported on some of these shelters
@@ -117,8 +115,6 @@ I believe that this sudden decrease is likely contributed by the emergence of ma
 The spread characteristic of the virus could be another factor which possibly explains the decrease/little change in occupancy in shelters. As the virus is infamous for being easily contagious, it is possible that those without homes may have preferred to stay isolated from places with large crowds (i.e. shelters). This hypothesis is supported by the steadily declining numbers in occupancy at many shelters ever since COVID-19 was declared a pandemic. 
 
 
-
-<<<<<<< HEAD
 
 
 ```{r echo=FALSE}
@@ -506,27 +502,21 @@ youth_June_shelter %>%
 
 
 ```{r echo = FALSE}
-#STUFF ALEX SENT THROUGHT GITHUB
-=======
-install.packages("lmtest")
+#STUFF ALEX SENT THROUGHT GITHUB (#THIS IS THE ONE TO WORK ABOUT)
+
+#install.packages("lmtest")
 library(lmtest)
 
->>>>>>> 289b33cdd462585a63f7d4d5133906d9bbc49017
 shelterDataSub <- shelterData %>%
-  mutate(relaFreq = OCCUPANCY/CAPACITY) %>%
-  filter(as.character(SECTOR) == "Women" | as.character(SECTOR) == "Men" &
-           as.character(OCCUPANCY_DATE) > "2020-03-01T00:00:00") %>%
-  select(OCCUPANCY_DATE, SECTOR, CAPACITY, OCCUPANCY, SHELTER_CITY, relaFreq)
+  filter(as.character(OCCUPANCY_DATE) > "2020-03-17T00:00:00")
 # removes all NaNs caused by zero capacity values 
 shelterDataSub <- shelterDataSub[!(shelterDataSub$CAPACITY == 0), ] 
-<<<<<<< HEAD
-
 
 
 shelterModel <- glm(as.factor(relaFreq) ~ SECTOR + SHELTER_CITY, 
                  data=shelterDataSub, family=binomial(link='logit'))
 summary(shelterModel)
-=======
+
 # shelterModel <- glm(relaFreq ~ SECTOR + ORGANIZATION_NAME, 
 #                  data=shelterDataSub, family=binomial)
 # 
@@ -540,52 +530,44 @@ summary(shelterModel)
 # knitr::kable(odds, digits=3)
 # 
 # summary(shelterModel)
->>>>>>> 289b33cdd462585a63f7d4d5133906d9bbc49017
+
 
 shelterModel2 <- glm(OCCUPANCY ~ SECTOR + CAPACITY + SHELTER_CITY, data = shelterDataSub, family = poisson(link = "log"))
 
-<<<<<<< HEAD
-logOdds <- cbind(est = shelterModel$coef, confint(shelterModel, level = 0.95))
-odds <- exp(logOdds)
-odds[1,] <- odds[1,] / (1+odds[1,])
-rownames(odds)[1] = 'Baseline prob'
-=======
+
+#logOdds <- cbind(est = shelterModel$coef, confint(shelterModel, level = 0.95))
+#odds <- exp(logOdds)
+#odds[1,] <- odds[1,] / (1+odds[1,])
+#rownames(odds)[1] = 'Baseline prob'
+
 logRate <- cbind(est=shelterModel2$coef, confint(shelterModel2, level=0.99))
 
 summary(shelterModel2)
 knitr::kable(cbind(summary(shelterModel2)$coef,exp(logRate)),digits=3)
->>>>>>> 289b33cdd462585a63f7d4d5133906d9bbc49017
+
 
 shelterDataSub$SECTOR <- factor(shelterDataSub$SECTOR, ordered = FALSE)
 shelterDataSub$SHELTER_CITY <- factor(shelterDataSub$SHELTER_CITY, ordered = FALSE)
 
-<<<<<<< HEAD
+# need a better criteria for selecting a baseline
+shelterDataSub$category <- relevel(shelterDataSub$SECTOR, 'Men')
+shelterDataSub$city <- relevel(shelterDataSub$SHELTER_CITY, 'Toronto')
+# I still think an offset is required to give a proper "rate" value. Possible solution is to divide current occupancy by 
+# previous occupancy to return a percent change in occupancy per day?
 
-```
+#THIS IS THE IMPORTANT PART!!!!!
+shelterModel3 <- glm(OCCUPANCY ~ category + CAPACITY*city, data = shelterDataSub, family = poisson(link = "log"))
+logRate2 <- cbind(est=shelterModel3$coef, confint(shelterModel3, level=0.95))
+knitr::kable(cbind(exp(logRate2)),digits=3)
+
+lmtest::lrtest(shelterModel2, shelterModel3)
 
 
-
-
-```{r echo=FALSE}
-#STUFF ALEX SENT ME THROUGH FB:
+#My Work:
 shelterDataSub <- shelterData %>%
   mutate(relaFreq = OCCUPANCY/CAPACITY) %>%
-  filter(as.character(OCCUPANCY_DATE) > "2020-03-17T00:00:00") #& as.character(SECTOR) == "Women" | as.character(SECTOR) == "Men" | as.character(SECTOR) == "Co-ed" | as.character(SECTOR) == "Families" | as.character("Youth"))
-# removes all NaNs caused by zero capacity values (ARE YOU REFERRING TO THE #&????)
-shelterDataSub <- shelterDataSub[!(shelterDataSub$CAPACITY == 0), ] 
-#Commented out your model below, beacuse I believe its not the one we want.
-#shelterModel <- glm(relaFreq ~ SECTOR + ORGANIZATION_NAME, 
-                 #data=shelterDataSub, family=binomial)
-knitr::kable(summary(shelterModel)$coef, digits=3)
-logOdds <- cbind(est = shelterModel$coef, confint(shelterModel, level = 0.95))
-odds <- exp(logOdds)
-odds[1,] <- odds[1,] / (1+odds[1,])
-knitr::kable(odds, digits=3)
-summary(shelterModel)
-#Below is the model I believe we want
-shelterModel2 <- glm(OCCUPANCY ~ SECTOR + CAPACITY+SHELTER_CITY, data = shelterDataSub, family = poisson(link = "log"))
-summary(shelterModel2)
-#My Work:
+  filter(as.character(OCCUPANCY_DATE) > "2020-03-17T00:00:00")
+
 #Question: What Covariates do I want to add onto Alex's model? Play around with them a bit and see what significant values I get. This I will be able to determine from the p-values (the smaller they are the better). Next I will want to be able to interrupt the data. Most importantly, be able to determine what the intercept and coefficients tell us. Then I will want to determine a confidence interval both around the model, and the response variable (I think?). Look at past 302 notes to see where I did the confidence intervals around. KEEP IN MIND WE ARE DEALING WITH COUNT NOW, AND NO LONGER FREQUENCY!
 
 
@@ -596,36 +578,26 @@ count_shelterdata <- shelterData$SHELTER_CITY
 #Looking at the summary of shelterModel2 it can be seen that both the covariate Sector, Capacity and Shelter Location are important, because they have VERY small p-values.
 
 #Me Playing Around With Different Models:
-shelterModel2_mine <- glm(OCCUPANCY ~ SECTOR + CAPACITY + SHELTER_CITY + CAPACITY*SHELTER_CITY, data = shelterDataSub, family = poisson(link = "log"))
+#shelterModel2_mine <- glm(OCCUPANCY ~ SECTOR +  + CAPACITY*SHELTER_CITY + FACILITY_NAME, OR data = shelterDataSub, family = poisson(link = "log"))
 #When this interactive variable is added in (i.e CAPACITY*SHELTER_CITY), the sector: men no longer becomes significant (i.e it has a p-values of 0.11)
 summary(shelterModel2_mine)
-```
-=======
-# need a better criteria for selecting a baseline
-shelterDataSub$category <- relevel(shelterDataSub$SECTOR, 'Men')
-shelterDataSub$city <- relevel(shelterDataSub$SHELTER_CITY, 'Toronto')
-# I still think an offset is required to give a proper "rate" value. Possible solution is to divide current occupancy by 
-# previous occupancy to return a percent change in occupancy per day?
-shelterModel3 <- glm(OCCUPANCY ~ sectorCat + CAPACITY*city, data = shelterDataSub, family = poisson(link = "log"))
-logRate2 <- cbind(est=shelterModel3$coef, confint(shelterModel3, level=0.99))
-knitr::kable(cbind(summary(shelterModel3)$coef,exp(logRate2)),digits=3)
-
-lmtest::lrtest(shelterModel2, shelterModel3)
 
 ```
+
+
+
+
 The generalised linear model follows a Poisson regression with a log link, where the response represents the number of homeless clients in a shelter on that day.
 The covariates in the model are: SECTOR (categorization of the type of residents from "Men", "Women", "Families", "Co-ed" and "Youth"), SHELTER_CITY (the city of the shelter locations from "Toronto", "North York", "Scarborough" and "Etobicoke"), and CAPCITY (the maximum number of beds available for the residents). 
 
 The baseline represents the number of male homeless clients who are visiting a Toronto shelter. 
 
-From the table above, we can see that the number of clients who are Co-ed in Toronto shelters are similar to the number of male clients in Toronto shelters (P-value > 0.05).
+From the table above, we can see that there are more male clients in Toronto shelters than Women or Youth but less than families and co-ed clients in Toronto shelters. This is likely because these clients are considered at least pairs in numbers.
+
+Furthermore, considering the capacity estimate is greater than 1, we can deduce that most shelters have not been filled to their full capacity. This coincides with the earlier graph showing a general decrease in occupancy as time progressed and such behavior may be attributed to the increasing cases of COVID-19 in shelters. Such trend is also present when exploring the interactions between capacities and cities which implies that shelters in other cities also have vacant rooms/beds. 
+
+Unsurprisingly, the table also illustrates that there are greater number of clients in Toronto areas than its surrounding cities. 
 
 As seen from a small p-value, it is evident that model including the interaction between capacity and shelter city explains the data significantly more accurately. This is likely the result of some cities, such as Toronto, containing much larger facilities with higher capacity than other cities such as Scarborough and North York. 
->>>>>>> 289b33cdd462585a63f7d4d5133906d9bbc49017
 
 
-
-<<<<<<< HEAD
-=======
-```
->>>>>>> 289b33cdd462585a63f7d4d5133906d9bbc49017
