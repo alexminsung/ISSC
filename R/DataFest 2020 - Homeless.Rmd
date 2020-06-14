@@ -2,7 +2,7 @@
 title: "DataFest 2020 - How Will COVID-19 Affect the Occupancy in Temporary Shelters?"
 author: Minsung Kim and Jonas Lee
 date: June 15, 2020
-output: beamer_presentation
+output: pdf_document
 ---
 
 ```{r setup, include=FALSE}
@@ -73,7 +73,7 @@ shelterData %>%
 ```{r echo = FALSE}
 
 # recorded dates for COVID-19 cases exceeding 20 in shelters 
-importantDates <- c('2020-04-09T00:00:00', '2020-04-16T00:00:00', '2020-04-30T00:00:00', '2020-04-09T00:00:00',
+importantDates <- c('2020-04-09T00:00:00', '2020-04-16T00:00:00', '2020-05-20T00:00:00', '2020-04-09T00:00:00',
                     '2020-05-14T00:00:00', '2020-05-16T00:00:00', '2020-05-22T00:00:00')
 
 # creates a graph to showcase the correlation in some of the shelters
@@ -112,7 +112,7 @@ shelterDataSub$city <- relevel(shelterDataSub$SHELTER_CITY, 'Toronto')
 # model of interest
 shelterModel3 <- glm(OCCUPANCY ~ category + CAPACITY*city, data = shelterDataSub, family = poisson(link = "log"))
 logRate2 <- cbind(est=shelterModel3$coef, confint(shelterModel3, level=0.95))
-knitr::kable(cbind(exp(logRate2)),digits=3)
+knitr::kable(cbind(summary(shelterModel3)$coeff, exp(logRate2)),digits=3)
 
 # likelihood test
 lmtest::lrtest(shelterModel2, shelterModel3)
@@ -125,7 +125,7 @@ The baseline represents the number of male homeless clients who are visiting a T
 
 From the table above, we can see that there are more male clients in Toronto shelters than Women or Youth but less than families and co-ed clients in Toronto shelters. This is likely because these clients are considered at least pairs in numbers.
 
-Furthermore, considering the capacity estimate is greater than 1, we can deduce that most shelters have not been filled to their full capacity. This coincides with the earlier graph showing a general decrease in occupancy as time progressed and such behavior may be attributed to the increasing cases of COVID-19 in shelters. Such trend is also present when exploring the interactions between capacities and cities which implies that shelters in other cities also have vacant rooms/beds. 
+Furthermore, considering the capacity estimate is greater than 1, we can deduce that most shelters have not been filled to their full capacity. This coincides with the earlier graph showing a general decrease in occupancy as time progressed and such behavior may be attributed to the increasing cases of COVID-19 in shelters. Such trend is also prevalent when exploring the interactions between capacities and cities which implies that shelters in other cities also have vacant rooms/beds. 
 
 Unsurprisingly, the table also illustrates that there are greater number of clients in Toronto areas than its surrounding cities. 
 

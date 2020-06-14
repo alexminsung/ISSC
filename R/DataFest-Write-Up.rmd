@@ -1,0 +1,144 @@
+---
+title: "Writeup For DataFest"
+author: "Jonas"
+date: "13/06/2020"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+####The Statistically Analysis regarding the number of Occupants in GTA shelters during the COVID-19 lockdown
+
+#$\underline{OverView}$
+
+
+$\bold{Jonas}$
+
+$\underline{hello}$
+
+For our project we decided to focus on the issue regarding whether there was a change in the number of people using the GTA shelters between March 17, 2020 and June 8, 2020.
+
+To help us analyze this issue we first gathered the daily data about the shelters listed in the GTA, that are publicaly avaibale here:"https://open.toronto.ca/dataset/daily-shelter-occupancy/". An appropiate possion regression model waas made to fit the data. And from the model we were able to determine that there was either an uniform or decrease in the number of people that stayed in the GTA shelters during the time period.
+
+Portion = total number of occupants in a given sector / total number of occupants
+
+#$\underline{Descriptive Summary Statistics Of Occupancy}$
+
+$Sector$ | $Mean$ | $\sigma$ | $Q1$  | $Median$ | $Q3$  | $Min$ | $Max$  | $Proportion$
+-------- | ------ | -------- | ----- | -------- | ----- | ----- | ------ | ------------
+Total    | 47.04  |  74.72   | 10.00 | 28.00    | 56.00 | 0.00  | 700.00 | 1.00
+Men      | 39.16  |  42.15   | 12.00 | 28.00    | 58.00 | 0.00  | 290.00 | 0.061
+Women    | 27.40  |  28.65   | 4.00  | 21.00    | 38.00 | 0.00  | 166.00 | 0.12
+Co-ed    | 39.52  |  36.44   | 10.00 | 33.00    | 70.00 | 0.00  | 178.00 | 0.034
+Families | 119.40 |  150.99  | 25.00 | 72.00    | 143.0 | 0.00  | 700.00 | 0.061
+Youth    | 24.44  |  18.57   | 11.00 | 22.00    | 32.00 | 0.00  | 95.00  | 0.18
+
+```{r echo=FALSE, eval=TRUE, message=FALSE, results=FALSE}
+#summary statistics that covers (mean, median, min, max, and the three quantiles)
+#KEY COMPONENT UP THERE IS: message=FALSE
+shelterData <- read.csv("https://raw.githubusercontent.com/alexminsung/ISSC/master/data/Daily%20shelter%20occpancy%20current.csv?token=APUVSRCQBS7QDHDGTMGCLMS65JGQU")
+attach(shelterData)
+library(shiny)
+library(shinydashboard)
+library(tidyverse)
+library(ggplot2)
+library(dplyr)
+#summary(shelterData$OCCUPANCY)
+shelterData_sub <- shelterData %>%
+  filter(as.character(OCCUPANCY_DATE) > "2020-03-17T00:00:00")
+summaryofdata <- summary(shelterData_sub$OCCUPANCY)
+sdofdata <- sd(shelterData_sub$OCCUPANCY)
+shelterData_men <- shelterData %>%
+  filter(as.character(OCCUPANCY_DATE) > "2020-03-17T00:00:00" & as.character(SECTOR) == "Men")
+#summaryofmen <- summary(shelterData_men$OCCUPANCY)
+#summaryofmen
+shelterData_wommen <- shelterData %>%
+  filter(as.character(OCCUPANCY_DATE) > "2020-03-17T00:00:00" & as.character(SECTOR) == "Women")
+#summaryofwomen <- summary(shelterData_wommen$OCCUPANCY)
+#summaryofwomen
+#sd(summaryofwomen$OCCUPANCY)
+shelterData_coed <- shelterData %>%
+  filter(as.character(OCCUPANCY_DATE) > "2020-03-17T00:00:00" & as.character(SECTOR) == "Co-ed")
+shelterData_families <- shelterData %>%
+  filter(as.character(OCCUPANCY_DATE) > "2020-03-17T00:00:00" & as.character(SECTOR) == "Families")
+shelterData_youth <- shelterData %>%
+  filter(as.character(OCCUPANCY_DATE) > "2020-03-17T00:00:00" & as.character(SECTOR) == "Youth")
+
+#Proportion of People that stayed in shelters for Women:
+womenshelter_proportion <- (sum(shelterData_wommen$OCCUPANCY) / sum(shelterData$OCCUPANCY))
+womenshelter_proportion
+
+#Proportion of People that  stayed in shelters for Men:
+menshelter_proportion <- (sum(shelterData_men$OCCUPANCY) / sum(shelterData$OCCUPANCY))
+menshelter_proportion
+
+#Proportion of People that stayed in shelters for Youth:
+youthnshelter_proportion <- (sum(shelterData_youth$OCCUPANCY) / sum(shelterData$OCCUPANCY))
+youthnshelter_proportion
+
+#Proportiong of People that stayed in Co-ed shelters:
+coedshelter_proportion <- (sum(shelterData_coed$OCCUPANCY) / sum(shelterData$OCCUPANCY))
+coedshelter_proportion
+
+#Proportion of People that stayed in shelters for Families:
+Familyshelter_proportion <- (sum(shelterData_families$OCCUPANCY) / sum(shelterData$OCCUPANCY))
+Familyshelter_proportion
+```
+
+
+
+####$\underline{Hypothesis Testing:}$
+$H_{0}$: From March 17, 2020 till June 8, 2020 there is no significant change in the number of occupants residing in GTA shelters.
+$H_{1}$: From March 17, 2020 till June 8, 2020 there is a significant change in the number of occupants residing in GTA shelters.
+$\alpha$ = 0.05
+```{r echo=FALSE}
+
+```
+
+
+####$\underline{Summarizing Statistical Test Outcomes:}$
+```{r echo=FALSE, message=FALSE, results=FALSE}
+library(lmtest)
+#install.packages("broom")
+library(broom)
+shelterDataSub <- shelterData %>%
+  filter(as.character(OCCUPANCY_DATE) > "2020-03-17T00:00:00")
+# removes all NaNs caused by zero capacity values 
+shelterDataSub <- shelterDataSub[!(shelterDataSub$CAPACITY == 0), ] 
+
+relaFreq = OCCUPANCY/CAPACITY
+
+shelterModel2 <- glm(OCCUPANCY ~ SECTOR + CAPACITY + SHELTER_CITY, data = shelterDataSub, family = poisson(link = "log"))
+
+logRate <- cbind(est=shelterModel2$coef, confint(shelterModel2, level=0.99))
+
+shelterDataSub$SECTOR <- factor(shelterDataSub$SECTOR, ordered = FALSE)
+shelterDataSub$SHELTER_CITY <- factor(shelterDataSub$SHELTER_CITY, ordered = FALSE)
+
+shelterDataSub$category <- relevel(shelterDataSub$SECTOR, 'Men')
+shelterDataSub$city <- relevel(shelterDataSub$SHELTER_CITY, 'Toronto')
+
+
+
+shelterModel3 <- glm(OCCUPANCY ~ category + CAPACITY*city, data = shelterDataSub, family = poisson(link = "log"))
+logRate2 <- cbind(est=shelterModel3$coef, confint(shelterModel3, level=0.95))
+knitr::kable(cbind(exp(logRate2)),digits=3)
+summary(shelterModel3)
+#plot(shelterModel3)
+#tidy(shelterModel3) #gives the coefficients of our model as a data frame
+#glance(shelterModel3) #gives the rest of the stats as a data frame
+#(tidy(shelterModel3)$p.value) #this just gives us the p-values
+#hello <- data.frame((tidy(shelterModel3)$p.value))
+
+lmtest::lrtest(shelterModel2, shelterModel3)
+```
+
+```{r echo=FALSE}
+plot(shelterModel3$y)
+```
+
+For the purpose of our project we assumed a signifigance level $alpha$=0.05. From the gg-plot we noticed that there was a trend where shelters either approximately maintained a constant number of occupants in the shelters as time progressed, or had either a slight or significant decrease in the number of occupants in certain shelters or had certain dips in the number of reported occupants in shelters but was able to rally and proceed to approxiamtely have a constant number of occupants. In particular we were able to identify drastics drops in reported number of occupants in certain shelters, once a significant number number of reported COVID-19 cases were reported in an alternative shelter. Additionally notice that when the likelihood Ratio of Test Of Nested Models occurs, a p-value smaller thena 0.05 is  obtained indicating that our model is statistically significant 
+
+Something else of other signifigance is that the point 331 is an influential point.

@@ -18,7 +18,7 @@ knitr::opts_chunk$set(echo = FALSE, warning = F, message = F)
 library(tidyverse)
 library(ggplot2)
 library(lmtest)
-library(kableExtra)
+
 #reading the csv
 shelterData <- read.csv("https://raw.githubusercontent.com/alexminsung/ISSC/master/data/Daily%20shelter%20occpancy%20current.csv?token=APUVSRCQBS7QDHDGTMGCLMS65JGQU")
 attach(shelterData)
@@ -82,8 +82,8 @@ shelterData %>%
 ```{r echo = FALSE, out.width= "120%"}
 
 # recorded dates for COVID-19 cases exceeding 20 in shelters 
-importantDates <- c('2020-04-09T00:00:00', '2020-04-16T00:00:00', '2020-04-30T00:00:00', '2020-04-09T00:00:00',
-                    '2020-05-14T00:00:00', '2020-05-16T00:00:00', '2020-05-22T00:00:00')
+importantDates <- c('2020-05-07T00:00:00', '2020-05-19T00:00:00', '2020-04-09T00:00:00',
+                    '2020-05-16T00:00:00','2020-06-02T00:00:00', '2020-06-07T00:00:00')
 
 # creates a graph to showcase the correlation in some of the shelters
 shelterByCovid %>%
@@ -114,10 +114,10 @@ shelterByCovid %>%
   
 \end{multicols}
   
-## The Analysis 
+## The Analysis
 
   
-```{r echo = FALSE, out.width='200px'}
+```{r echo = FALSE, results = FALSE}
 
 # dataset used for model
 shelterDataSub <- shelterData %>%
@@ -138,11 +138,20 @@ shelterDataSub$city <- relevel(shelterDataSub$SHELTER_CITY, 'Toronto')
 # model of interest
 shelterModel3 <- glm(OCCUPANCY ~ category + CAPACITY*city, data = shelterDataSub, family = poisson(link = "log"))
 logRate2 <- cbind(est=shelterModel3$coef, confint(shelterModel3, level=0.95))
-exp(logRate2)
 
-# likelihood test
-#lmtest::lrtest(shelterModel2, shelterModel3)
+# creates a table including p-value 
+table <- data.frame(cbind(exp(logRate2), summary(shelterModel3)$coeff[ ,4]))
+names(table) <- c("est", "2.5%", "97.5%", "Pr(>|z|)")
+knitr::kable(table,digits=3)
 
 ```
+
+\begin{itemize}
+    \item Our analysis through a poisson regression have shown that most shelters still had vacant rooms available even during            the lockdown
+    \begin{enumerate}
+     \item Supported by the downward trend in occupancy to capacity rate shown in the graphs 
+   \end{enumerate}
+   \item Unlike our initial thoughts, the results suggest that shelters generally experienced a drop in occupancy rather than an          increase during the pandemic
+  \end{itemize}
 
  
