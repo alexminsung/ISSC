@@ -1,0 +1,148 @@
+---
+title: "DataFest 2020 - How Will COVID-19 Affect the Occupancy in Temporary Shelters?"
+author: Minsung Kim and Jonas Lee
+date: June 15, 2020
+output: beamer_presentation
+keep_tex: yes
+header-includes:
+- \usepackage{multicol}
+
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = F, message = F)
+
+```
+
+```{r message = FALSE, echo = FALSE}
+library(tidyverse)
+library(ggplot2)
+library(lmtest)
+library(kableExtra)
+#reading the csv
+shelterData <- read.csv("https://raw.githubusercontent.com/alexminsung/ISSC/master/data/Daily%20shelter%20occpancy%20current.csv?token=APUVSRCQBS7QDHDGTMGCLMS65JGQU")
+attach(shelterData)
+
+# list of shelters to use later
+target <- c("Cornerstone Place", "Fred Victor Centre", "St. Simon's Shelter Inc.",
+            "The Scott Mission Inc.")
+
+# filters the data for use of comparing the relationship between COVID-19 cases and occupancy numbers in shelters
+shelterByCovid <- shelterData %>%
+  filter(as.character(ORGANIZATION_NAME) %in% target)
+
+```
+
+## Changes in Percentage since COVID-19 Lockdown
+
+
+\begin{multicols}{2}
+
+  \null \vfill
+
+```{r message = FALSE, echo = FALSE, out.width= "100%"}
+
+# filters the data to include only Men and Women observations. Such measurements were taken because they made up most of the 
+# observations and also to better illustrate a trend.
+shelterData %>%
+  filter(as.character(SECTOR) == "Women" & as.character(OCCUPANCY_DATE) > "2020-03-01T00:00:00") %>%
+  mutate(relaFreq = OCCUPANCY/CAPACITY) %>%
+  ggplot(aes(x = OCCUPANCY_DATE, y = relaFreq, color = SHELTER_NAME)) + geom_point() + facet_wrap(SHELTER_CITY~ORGANIZATION_NAME) + theme(axis.text.x=element_blank(), axis.ticks.x=element_blank()) + 
+  labs(title = "Shelters Occupancy to Capacity Percent by Organizations (Women)", x = "Occupancy Date", y = "Relative Frequency", 
+       colour = "Shelter Names")
+  
+shelterData %>%
+  filter(as.character(SECTOR) == "Men" & as.character(OCCUPANCY_DATE) > "2020-03-01T00:00:00") %>%
+  mutate(relaFreq = OCCUPANCY/CAPACITY) %>%
+  ggplot(aes(x = OCCUPANCY_DATE, y = relaFreq, color = SHELTER_NAME)) + geom_point() + facet_wrap(SHELTER_CITY~ORGANIZATION_NAME) + theme(axis.text.x=element_blank(), axis.ticks.x=element_blank()) + 
+  labs(title = "Shelters Occupancy to Capacity Percent by Organizations (Men)", x = "Occupancy Date", y = "Relative Frequency", colour = "Shelter Names")
+
+
+  
+```
+
+  \vfill \null
+
+ \columnbreak
+
+  \null \vfill
+  \begin{itemize}
+    \item The data shown starts from the day when Ontario was declared to be at a state of emergency (March 17).
+    \item Some shelters show a downward trend while others remain stable
+  \end{itemize}
+  \vfill \null
+\end{multicols}
+
+## Are COVID-19 and Number of Occupancies Correlated?
+
+\begin{multicols}{2}
+
+  \null \vfill
+
+```{r echo = FALSE, out.width= "120%"}
+
+# recorded dates for COVID-19 cases exceeding 20 in shelters 
+importantDates <- c('2020-04-09T00:00:00', '2020-04-16T00:00:00', '2020-04-30T00:00:00', '2020-04-09T00:00:00',
+                    '2020-05-14T00:00:00', '2020-05-16T00:00:00', '2020-05-22T00:00:00')
+
+# creates a graph to showcase the correlation in some of the shelters
+shelterByCovid %>%
+  filter(as.character(OCCUPANCY_DATE) > "2020-03-017T00:00:00") %>%
+  mutate(relaFreq = OCCUPANCY/CAPACITY) %>%
+  ggplot(aes(x = OCCUPANCY_DATE, y = OCCUPANCY, color = SHELTER_NAME)) + geom_point() + 
+  facet_wrap(~ORGANIZATION_NAME) +
+  geom_vline(xintercept = importantDates, color= "black", linetype="dashed") + 
+  theme(axis.text.x=element_blank(), axis.ticks.x=element_blank()) + 
+  labs(title = "Shelters Occupancy Count by Organizations", x = "Occupancy Date",
+       y = "Frequency", colour = "Shelter Names")
+```
+
+  \vfill \null
+
+  \columnbreak
+
+  \null \vfill
+  \begin{itemize}
+    \item Drop in occupancy numbers coincides with the reported date of an outbreak within a shelter
+    \item Could be explained by two reasons:
+    \begin{enumerate}
+     \item The shelter experiencing a drop is the shelter reporting an outbreak
+     \item Residents in other shelters are leaving out of fear after the news of an outbreak 
+   \end{enumerate}
+  \end{itemize}
+  \vfill \null
+  
+\end{multicols}
+  
+## The Analysis 
+
+  
+```{r echo = FALSE, out.width= "10%"}
+
+# dataset used for model
+shelterDataSub <- shelterData %>%
+  filter(as.character(OCCUPANCY_DATE) > "2020-03-17T00:00:00") 
+
+# removes all NaNs caused by zero capacity values 
+shelterDataSub <- shelterDataSub[!(shelterDataSub$CAPACITY == 0), ] 
+
+# model used for comparison with another model using Likelihood Test
+shelterModel2 <- glm(OCCUPANCY ~ SECTOR + CAPACITY + SHELTER_CITY, data = shelterDataSub, family = poisson(link = "log"))
+
+# manually assigning the baseline
+shelterDataSub$SECTOR <- factor(shelterDataSub$SECTOR, ordered = FALSE)
+shelterDataSub$SHELTER_CITY <- factor(shelterDataSub$SHELTER_CITY, ordered = FALSE)
+shelterDataSub$category <- relevel(shelterDataSub$SECTOR, 'Men')
+shelterDataSub$city <- relevel(shelterDataSub$SHELTER_CITY, 'Toronto')
+
+# model of interest
+shelterModel3 <- glm(OCCUPANCY ~ category + CAPACITY*city, data = shelterDataSub, family = poisson(link = "log"))
+logRate2 <- cbind(est=shelterModel3$coef, confint(shelterModel3, level=0.95))
+knitr::kable(cbind(exp(logRate2)),digits=3, format = "latex", table.attr = "style='width:30%;'")
+
+# likelihood test
+#lmtest::lrtest(shelterModel2, shelterModel3)
+
+```
+
+ 
