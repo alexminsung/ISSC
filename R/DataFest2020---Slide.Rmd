@@ -1,5 +1,5 @@
 ---
-title: "DataFest 2020 - How Will COVID-19 Affect Temporary Shelters? (Exploring changes in occupancies and compositions)"
+title: "DataFest 2020 - How Will COVID-19 Affect Temporary Shelters? (Exploring Changes in Occupancies and Sector Compositions)"
 author: Minsung Kim and Jonas Lee
 date: June 14, 2020
 output: beamer_presentation
@@ -117,7 +117,7 @@ shelterByCovid %>%
 ## The Analysis
 
 \begin{itemize}
-    \item Our analysis through a poisson regression have shown that families are still the most predominant groups of clients.
+    \item Our analysis through a poisson regression have shown that families are still the most predominant sector of clients.
     \begin{enumerate}
      \item This result is plausible because families usually visit in trios.
    \end{enumerate}
