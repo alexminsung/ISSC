@@ -1,6 +1,8 @@
 ---
-title: "DataFest 2020 - Homeless"
-output: slidy_presentation
+title: "DataFest 2020 - How Will COVID-19 Affect the Occupancy in Temporary Shelters?"
+author: Minsung Kim and Jonas Lee
+date: June 15, 2020
+output: beamer_presentation
 ---
 
 ```{r setup, include=FALSE}
@@ -9,43 +11,32 @@ knitr::opts_chunk$set(echo = FALSE)
 
 
 ```{r message = FALSE, echo = FALSE}
-library(shiny)
-library(shinydashboard)
 library(tidyverse)
 library(ggplot2)
+
 library(dplyr)
 
 #Reading the csv
+library(lmtest)
+#reading the csv
+
 shelterData <- read.csv("https://raw.githubusercontent.com/alexminsung/ISSC/master/data/Daily%20shelter%20occpancy%20current.csv?token=APUVSRCQBS7QDHDGTMGCLMS65JGQU")
 attach(shelterData)
 
-# shelterData %>% 
-#   distinct(SHELTER_NAME)
+# list of shelters to use later
+target <- c("Cornerstone Place", "Fred Victor Centre", "St. Simon's Shelter Inc.",
+            "The Scott Mission Inc.")
 
-# Finds all rows that starts witih "HFS"
-HFS <- grep("^HFS", as.character(shelterData$SHELTER_NAME), value = TRUE)
-
-# List of shelters with COVID19 cases
-target <- c("COSTI Reception Centre", "Seaton House", HFS, "Salvation Army - Maxwell Meighen", 
-            "SVDP - Mary's Home", "Robertson House")
-
-# Filters the data by reported Covid19 cases
+# filters the data for use of comparing the relationship between COVID-19 cases and occupancy numbers in shelters
 shelterByCovid <- shelterData %>%
-  filter(as.character(SHELTER_NAME) %in% target)
+  filter(as.character(ORGANIZATION_NAME) %in% target)
 
 ```
 
-Qs: The effects of covid19 on homeless shelters/homeless?
-- but how does an increase in occupancy in shelter a impact the society (societal impact)?
-- the numbers are obviously going to increase because non-essential travels are restricted and homeless are more likely to be in shelters
-- there are possible health impacts...
-
-1. try to sort the data to include 14 days period before the reported case
-2. (if possible) compare it to the reported case around the region at the time of the reported case (or couple days after)
-  - want to see if these shelters acted as a hotspot
-
+Qs: The effects of covid19 on the occupancy count(percent) of temporary shelters around GTA
 
 ```{r echo = FALSE}
+
 #I have separated the data by sector as you suggested but even then the points are very messy. If you can think of a way to 
 # improve this, then go ahead
 
@@ -74,17 +65,24 @@ shelterData %>%
   mutate(relaFreq = OCCUPANCY/CAPACITY) %>%
   ggplot(aes(x = OCCUPANCY_DATE, y = relaFreq, color = SHELTER_NAME)) + facet_wrap(SHELTER_CITY~ORGANIZATION_NAME) + geom_point() + theme(axis.text.x=element_blank(), axis.ticks.x=element_blank()) 
 
+# filters the data to include only Men and Women observations. Such measurements were taken because they made up most of the 
+# observations and also to better illustrate a trend.
 shelterData %>%
-  filter(as.character(SECTOR) == "Men" & as.character(OCCUPANCY_DATE) > "2020-03-01T00:00:00") %>%
+  filter(as.character(SECTOR) == "Women" & as.character(OCCUPANCY_DATE) > "2020-03-17T00:00:00") %>%
   mutate(relaFreq = OCCUPANCY/CAPACITY) %>%
   ggplot(aes(x = OCCUPANCY_DATE, y = relaFreq, color = SHELTER_NAME)) + facet_wrap(SHELTER_CITY~ORGANIZATION_NAME) + geom_point() + theme(axis.text.x=element_blank(), axis.ticks.x=element_blank()) 
 
 
-
+  ggplot(aes(x = OCCUPANCY_DATE, y = relaFreq, color = SHELTER_NAME)) + geom_point() + facet_wrap(SHELTER_CITY~ORGANIZATION_NAME) + theme(axis.text.x=element_blank(), axis.ticks.x=element_blank()) + 
+  labs(title = "Shelters Occupancy to Capacity Percent by Organizations (Women)", x = "Occupancy Date", y = "Relative Frequency", 
+       colour = "Shelter Names")
+  
 shelterData %>%
-  filter(as.character(SECTOR) == "Youth" & as.character(OCCUPANCY_DATE) > "2020-03-01T00:00:00") %>%
+  filter(as.character(SECTOR) == "Men" & as.character(OCCUPANCY_DATE) > "2020-03-17T00:00:00") %>%
   mutate(relaFreq = OCCUPANCY/CAPACITY) %>%
-  ggplot(aes(x = OCCUPANCY_DATE, y = relaFreq, color = SHELTER_NAME)) + facet_wrap(SHELTER_CITY~ORGANIZATION_NAME) + geom_point() + theme(axis.text.x=element_blank(), axis.ticks.x=element_blank()) 
+  ggplot(aes(x = OCCUPANCY_DATE, y = relaFreq, color = SHELTER_NAME)) + geom_point() + facet_wrap(SHELTER_CITY~ORGANIZATION_NAME) + theme(axis.text.x=element_blank(), axis.ticks.x=element_blank()) + 
+  labs(title = "Shelters Occupancy to Capacity Percent by Organizations (Women)", x = "Occupancy Date", y = "Relative Frequency", colour = "Shelter Names")
+
 
   
 ```
@@ -93,26 +91,43 @@ shelterData %>%
 
 
 ```{r echo = FALSE}
-# this is on the side, since i wanted to see if the numbers dropped after a covid19 case was reported on some of these shelters
-shelterByCovid %>%
-  filter(as.character(OCCUPANCY_DATE) > "2020-03-01T00:00:00" & as.character(ORGANIZATION_NAME) == "Homes First Society"
-         & as.character(SECTOR) == "Women") %>%
-  mutate(log_occupancy = log(OCCUPANCY)) %>%
-  ggplot(aes(x = OCCUPANCY_DATE, y = OCCUPANCY, color = SHELTER_NAME)) + geom_point() + 
-  facet_wrap(~ORGANIZATION_NAME) +
-  geom_vline(aes(xintercept = '2020-04-09T00:00:00'), color="black", linetype="dashed") + 
-  geom_vline(aes(xintercept = '2020-03-17T00:00:00'), color="red", linetype="dashed") +
-  #theme(axis.text.x=element_blank(), axis.ticks.x=element_blank()) 
-  theme(axis.text.x = element_text(angle=90, hjust=0))
 
+#Men for a month by month basis:
+# men_january <- c("2020-01-01T00:00:00", "2020-01-02T00:00:00", "2020-01-03T00:00:00", "2020-01-04T00:00:00", "2020-01-05T00:00:00", "2020-01-06T00:00:00", "2020-01-07T00:00:00", "2020-01-08T00:00:00", "2020-01-09T00:00:00", "2020-01-10T00:00:00", "2020-01-11T00:00:00", "2020-01-12T00:00:00", "2020-01-13T00:00:00", "2020-01-14T00:00:00", "2020-01-15T00:00:00", "2020-01-16T00:00:00", "2020-01-17T00:00:00", "2020-01-18T00:00:00", "2020-01-19T00:00:00", "2020-01-20T00:00:00", "2020-01-21T00:00:00", "2020-01-22T00:00:00", "2020-01-23T00:00:00", "2020-01-24T00:00:00", "2020-01-25T00:00:00", "2020-01-26T00:00:00", "2020-01-27T00:00:00", "2020-01-28T00:00:00", "2020-01-29T00:00:00", "2020-01-30T00:00:00", "2020-01-31T00:00:00")
+# men_february <- c("2020-02-01T00:00:00", "2020-02-02T00:00:00", "2020-02-03T00:00:00", "2020-02-04T00:00:00", "2020-02-05T00:00:00", "2020-02-06T00:00:00", "2020-02-07T00:00:00", "2020-02-08T00:00:00", "2020-02-09T00:00:00", "2020-02-10T00:00:00", "2020-02-11T00:00:00", "2020-02-12T00:00:00", "2020-02-13T00:00:00", "2020-02-14T00:00:00", "2020-02-15T00:00:00", "2020-02-16T00:00:00", "2020-02-17T00:00:00", "2020-02-18T00:00:00", "2020-02-19T00:00:00", "2020-02-20T00:00:00", "2020-02-21T00:00:00", "2020-02-22T00:00:00", "2020-02-23T00:00:00", "2020-02-24T00:00:00", "2020-02-25T00:00:00", "2020-02-26T00:00:00", "2020-02-27T00:00:00", "2020-02-28T00:00:00", "2020-02-29T00:00:00")
+# men_march <- c("2020-03-01T00:00:00", "2020-03-02T00:00:00", "2020-03-03T00:00:00", "2020-03-04T00:00:00", "2020-03-05T00:00:00", "2020-03-06T00:00:00", "2020-03-07T00:00:00", "2020-03-08T00:00:00", "2020-03-09T00:00:00", "2020-03-10T00:00:00", "2020-03-11T00:00:00", "2020-03-12T00:00:00", "2020-03-13T00:00:00", "2020-03-14T00:00:00", "2020-03-15T00:00:00", "2020-03-16T00:00:00", "2020-03-17T00:00:00", "2020-03-18T00:00:00", "2020-03-19T00:00:00", "2020-03-20T00:00:00", "2020-03-21T00:00:00", "2020-03-22T00:00:00", "2020-03-23T00:00:00", "2020-03-24T00:00:00", "2020-03-25T00:00:00", "2020-03-26T00:00:00", "2020-03-27T00:00:00", "2020-03-28T00:00:00", "2020-03-29T00:00:00", "2020-03-30T00:00:00", "2020-03-31T00:00:00")
+# men_april <- c("2020-04-01T00:00:00", "2020-04-02T00:00:00", "2020-04-03T00:00:00", "2020-04-04T00:00:00", "2020-04-05T00:00:00", "2020-04-06T00:00:00", "2020-04-07T00:00:00", "2020-04-08T00:00:00", "2020-04-09T00:00:00", "2020-04-10T00:00:00", "2020-04-11T00:00:00", "2020-04-12T00:00:00", "2020-04-13T00:00:00", "2020-04-14T00:00:00", "2020-04-15T00:00:00", "2020-04-16T00:00:00", "2020-04-17T00:00:00", "2020-04-18T00:00:00", "2020-04-19T00:00:00", "2020-04-20T00:00:00", "2020-04-21T00:00:00", "2020-04-22T00:00:00", "2020-04-23T00:00:00", "2020-04-24T00:00:00", "2020-04-25T00:00:00", "2020-04-26T00:00:00", "2020-04-27T00:00:00", "2020-04-28T00:00:00", "2020-04-29T00:00:00", "2020-04-30T00:00:00")
+# men_may <- c("2020-05-01T00:00:00", "2020-05-02T00:00:00", "2020-05-03T00:00:00", "2020-05-04T00:00:00", "2020-05-05T00:00:00", "2020-05-06T00:00:00", "2020-05-07T00:00:00", "2020-05-08T00:00:00", "2020-05-09T00:00:00", "2020-05-10T00:00:00", "2020-05-11T00:00:00", "2020-05-12T00:00:00", "2020-05-13T00:00:00", "2020-05-14T00:00:00", "2020-05-15T00:00:00", "2020-05-16T00:00:00", "2020-05-17T00:00:00", "2020-05-18T00:00:00", "2020-05-19T00:00:00", "2020-05-20T00:00:00", "2020-05-21T00:00:00", "2020-05-22T00:00:00", "2020-05-23T00:00:00", "2020-05-24T00:00:00", "2020-05-25T00:00:00", "2020-05-26T00:00:00", "2020-05-27T00:00:00", "2020-05-28T00:00:00", "2020-05-29T00:00:00", "2020-05-30T00:00:00", "2020-05-31T00:00:00")
+# men_june <- c("2020-06-01T00:00:00", "2020-06-02T00:00:00", "2020-06-03T00:00:00", "2020-06-04T00:00:00", "2020-06-05T00:00:00", "2020-06-06T00:00:00", "2020-06-07T00:00:00", "2020-06-08T00:00:00")
+# # Filters the data by Occupancy Date
+# monthM <- c(men_january, men_february, men_march, men_april, men_may, men_june)
+# 
+# 
+# shelterData %>%
+#   filter(as.character(SECTOR) == "Men" & as.character(OCCUPANCY_DATE) %in% men_april) %>%
+#   mutate(relaFreq = OCCUPANCY/CAPACITY) %>%
+#   ggplot(aes(x = OCCUPANCY_DATE, y = relaFreq, color = SHELTER_NAME)) + facet_wrap(SHELTER_CITY~ORGANIZATION_NAME) + geom_point() + theme(axis.text.x=element_blank(), axis.ticks.x=element_blank()) +  geom_vline(xintercept = importantDates, color= "black", linetype="dashed") + theme(axis.text.x=element_blank(), axis.ticks.x=element_blank()) 
 ```
 
-Unlike our previous hypothesis, comparing the occupancy of Women shelters around Scarborough and Toronto have shown either a general decrease in numbers or minimal changes at best. Only one stands as an exception to this, which is the Home First Society Women's sector, where there have been a slight increase in numbers ever since Toronto's lock-down on March 17  (indicated by a red line). However, even this facility shows to illustrate a much steeper decrease around April 21st. 
+```{r echo = FALSE}
 
-I believe that this sudden decrease is likely contributed by the emergence of mass infections which occurred at the Homes First Shelter - Willowdale Welcome Center on the 9th of April. Considered as the "largest COVID-19 outbreak in the city's shelter system" by Toronto Star (https://www.thestar.com/news/gta/2020/05/24/how-a-haven-for-refugees-became-home-to-the-worst-covid-19-outbreak-in-torontos-shelter-system.html), it is no doubt that this foreboding news caught the attention of many residents in other shelters. While without solid evidence, I believe such news could have instilled fears among the residents in other Home First Society affiliated shelters, possibly providing a sufficient explanation in the sudden dip in occpancy. 
+# recorded dates for COVID-19 cases exceeding 20 in shelters 
+importantDates <- c('2020-04-09T00:00:00', '2020-04-16T00:00:00', '2020-04-30T00:00:00', '2020-04-09T00:00:00',
+                    '2020-05-14T00:00:00', '2020-05-16T00:00:00', '2020-05-22T00:00:00')
 
+# creates a graph to showcase the correlation in some of the shelters
+shelterByCovid %>%
+  filter(as.character(OCCUPANCY_DATE) > "2020-03-017T00:00:00") %>%
+  mutate(relaFreq = OCCUPANCY/CAPACITY) %>%
+  ggplot(aes(x = OCCUPANCY_DATE, y = OCCUPANCY, color = SHELTER_NAME)) + geom_point() + 
+  facet_wrap(~ORGANIZATION_NAME) +
+  geom_vline(xintercept = importantDates, color= "black", linetype="dashed") + 
+  theme(axis.text.x=element_blank(), axis.ticks.x=element_blank()) + 
+  labs(title = "Shelters Occupancy Count by Organizations", x = "Occupancy Date",
+       y = "Frequency", colour = "Shelter Names")
+```
 
-The spread characteristic of the virus could be another factor which possibly explains the decrease/little change in occupancy in shelters. As the virus is infamous for being easily contagious, it is possible that those without homes may have preferred to stay isolated from places with large crowds (i.e. shelters). This hypothesis is supported by the steadily declining numbers in occupancy at many shelters ever since COVID-19 was declared a pandemic. 
+Unlike our initial thoughts, we have discovered that the number of occupancies in shelters have been generally decreasing or stable. However, there has been an interesting correlation between the decline in occupancies and the reported dates of active COVID-19 outbreaks in shelters. The dates of the active cases are indicated by the dashed black lines and as seen from the graph above, it is clear that some of these dates coincide with the sudden drop in occupancies. One possible explanation of this trend can be interpreted as a direct consequence of an outbreak occurring in the said shelter. For example, When there was an outbreak reported at St. Simon's Shelter on May 16th, the immediate drop in occupancies can be seen on the graph (as indicated by the second last line). However, a similar relationship, between occupancy counts and day of an outbreak, could be noticed even in locations that are not directly affected by the outbreak. Such correlation can be explained by many residents leaving the facilities in response to ongoing outbreaks in the surrounding shelters.  
 
 
 
@@ -504,6 +519,7 @@ youth_June_shelter %>%
 ```{r echo = FALSE}
 #STUFF ALEX SENT THROUGHT GITHUB (#THIS IS THE ONE TO WORK ABOUT)
 
+
 #install.packages("lmtest")
 library(lmtest)
 
@@ -546,20 +562,37 @@ summary(shelterModel2)
 knitr::kable(cbind(summary(shelterModel2)$coef,exp(logRate)),digits=3)
 
 
+
+# dataset used for model
+shelterDataSub <- shelterData %>%
+  filter(as.character(OCCUPANCY_DATE) > "2020-03-17T00:00:00") 
+
+# removes all NaNs caused by zero capacity values 
+shelterDataSub <- shelterDataSub[!(shelterDataSub$CAPACITY == 0), ] 
+
+# model used for comparison with another model using Likelihood Test
+shelterModel2 <- glm(OCCUPANCY ~ SECTOR + CAPACITY + SHELTER_CITY, data = shelterDataSub, family = poisson(link = "log"))
+
+# manually assigning the baseline
+
 shelterDataSub$SECTOR <- factor(shelterDataSub$SECTOR, ordered = FALSE)
 shelterDataSub$SHELTER_CITY <- factor(shelterDataSub$SHELTER_CITY, ordered = FALSE)
-
-# need a better criteria for selecting a baseline
 shelterDataSub$category <- relevel(shelterDataSub$SECTOR, 'Men')
 shelterDataSub$city <- relevel(shelterDataSub$SHELTER_CITY, 'Toronto')
+
 # I still think an offset is required to give a proper "rate" value. Possible solution is to divide current occupancy by 
 # previous occupancy to return a percent change in occupancy per day?
 
 #THIS IS THE IMPORTANT PART!!!!!
+
+
+# model of interest
+
 shelterModel3 <- glm(OCCUPANCY ~ category + CAPACITY*city, data = shelterDataSub, family = poisson(link = "log"))
 logRate2 <- cbind(est=shelterModel3$coef, confint(shelterModel3, level=0.95))
 knitr::kable(cbind(exp(logRate2)),digits=3)
 
+# likelihood test
 lmtest::lrtest(shelterModel2, shelterModel3)
 
 
@@ -599,5 +632,3 @@ Furthermore, considering the capacity estimate is greater than 1, we can deduce 
 Unsurprisingly, the table also illustrates that there are greater number of clients in Toronto areas than its surrounding cities. 
 
 As seen from a small p-value, it is evident that model including the interaction between capacity and shelter city explains the data significantly more accurately. This is likely the result of some cities, such as Toronto, containing much larger facilities with higher capacity than other cities such as Scarborough and North York. 
-
-

@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.21 (TeX Live 2020/W32TeX) (preloaded format=pdflatex 2020.6.9)  13 JUN 2020 22:57
+This is pdfTeX, Version 3.14159265-2.6-1.40.21 (TeX Live 2020/W32TeX) (preloaded format=pdflatex 2020.6.14)  14 JUN 2020 22:22
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -440,24 +440,24 @@ File: l3backend-pdfmode.def 2020-06-03 L3 backend support: PDF mode
 ) (./DataFest-Write-Up.aux)
 \openout1 = `DataFest-Write-Up.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 76.
-LaTeX Font Info:    ... okay on input line 76.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 76.
-LaTeX Font Info:    ... okay on input line 76.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 76.
-LaTeX Font Info:    ... okay on input line 76.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 76.
-LaTeX Font Info:    ... okay on input line 76.
-LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 76.
-LaTeX Font Info:    ... okay on input line 76.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 76.
-LaTeX Font Info:    ... okay on input line 76.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 76.
-LaTeX Font Info:    ... okay on input line 76.
-LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 76.
-LaTeX Font Info:    ... okay on input line 76.
-LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 76.
-LaTeX Font Info:    ... okay on input line 76.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 77.
+LaTeX Font Info:    ... okay on input line 77.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 77.
+LaTeX Font Info:    ... okay on input line 77.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 77.
+LaTeX Font Info:    ... okay on input line 77.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 77.
+LaTeX Font Info:    ... okay on input line 77.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 77.
+LaTeX Font Info:    ... okay on input line 77.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 77.
+LaTeX Font Info:    ... okay on input line 77.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 77.
+LaTeX Font Info:    ... okay on input line 77.
+LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 77.
+LaTeX Font Info:    ... okay on input line 77.
+LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 77.
+LaTeX Font Info:    ... okay on input line 77.
 
 (c:/Users/headg/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/epstopdf-pkg/epsto
 pdf-base.sty
@@ -471,7 +471,7 @@ File: epstopdf-sys.cfg 2010/07/13 v1.3 Configuration of (r)epstopdf for TeX Liv
 e
 ))
 \AtBeginShipoutBox=\box53
-Package hyperref Info: Link coloring OFF on input line 76.
+Package hyperref Info: Link coloring OFF on input line 77.
 
 (c:/Users/headg/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/hyperref/nameref.s
 ty
@@ -487,9 +487,9 @@ Package: gettitlestring 2019/12/15 v1.6 Cleanup title references (HO)
 )
 \c@section@level=\count277
 )
-LaTeX Info: Redefining \ref on input line 76.
-LaTeX Info: Redefining \pageref on input line 76.
-LaTeX Info: Redefining \nameref on input line 76.
+LaTeX Info: Redefining \ref on input line 77.
+LaTeX Info: Redefining \pageref on input line 77.
+LaTeX Info: Redefining \nameref on input line 77.
 (./DataFest-Write-Up.out) (./DataFest-Write-Up.out)
 \@outlinefile=\write3
 \openout3 = `DataFest-Write-Up.out'.
@@ -529,94 +529,88 @@ LaTeX Info: Redefining \nameref on input line 76.
 * (1in=72.27pt=25.4mm, 1cm=28.453pt)
 
 LaTeX Font Info:    Trying to load font information for OT1+lmr on input line 7
-8.
+9.
 (c:/Users/headg/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/lm/ot1lmr.fd
 File: ot1lmr.fd 2009/10/30 v1.6 Font defs for Latin Modern
 )
 LaTeX Font Info:    Trying to load font information for OML+lmm on input line 7
-8.
+9.
 (c:/Users/headg/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/lm/omllmm.fd
 File: omllmm.fd 2009/10/30 v1.6 Font defs for Latin Modern
 )
 LaTeX Font Info:    Trying to load font information for OMS+lmsy on input line 
-78.
+79.
 (c:/Users/headg/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/lm/omslmsy.fd
 File: omslmsy.fd 2009/10/30 v1.6 Font defs for Latin Modern
 )
 LaTeX Font Info:    Trying to load font information for OMX+lmex on input line 
-78.
+79.
 (c:/Users/headg/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/lm/omxlmex.fd
 File: omxlmex.fd 2009/10/30 v1.6 Font defs for Latin Modern
 )
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <12> on input line 78.
+(Font)              <12> on input line 79.
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <8> on input line 78.
+(Font)              <8> on input line 79.
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <6> on input line 78.
-LaTeX Font Info:    Trying to load font information for U+msa on input line 78.
+(Font)              <6> on input line 79.
+LaTeX Font Info:    Trying to load font information for U+msa on input line 79.
 
 (c:/Users/headg/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/amsfonts/umsa.fd
 File: umsa.fd 2013/01/14 v3.01 AMS symbols A
 )
-LaTeX Font Info:    Trying to load font information for U+msb on input line 78.
+LaTeX Font Info:    Trying to load font information for U+msb on input line 79.
 
 (c:/Users/headg/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/amsfonts/umsb.fd
 File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 )
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <10> on input line 82.
+(Font)              <10> on input line 80.
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <7> on input line 82.
+(Font)              <7> on input line 80.
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <5> on input line 82.
+(Font)              <5> on input line 80.
 
 Package amsfonts Warning: Obsolete command \bold; \mathbf should be used instea
-d on input line 84.
+d on input line 117.
 
-<DataFest-Write-Up_files/figure-latex/unnamed-chunk-3-1.pdf, id=5, 469.755pt x 
-325.215pt>
-File: DataFest-Write-Up_files/figure-latex/unnamed-chunk-3-1.pdf Graphic file (
-type pdf)
-<use DataFest-Write-Up_files/figure-latex/unnamed-chunk-3-1.pdf>
-Package pdftex.def Info: DataFest-Write-Up_files/figure-latex/unnamed-chunk-3-1
-.pdf  used on input line 125.
-(pdftex.def)             Requested size: 469.75386pt x 325.2142pt.
 [1
 
 {c:/Users/headg/AppData/Roaming/TinyTeX/texmf-var/fonts/map/pdftex/updmap/pdfte
 x.map}]
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 149.
-[2 <./DataFest-Write-Up_files/figure-latex/unnamed-chunk-3-1.pdf>]
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 149.
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 187.
+[2]
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 187.
 (./DataFest-Write-Up.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 149.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 149.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 187.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 187.
 Package rerunfilecheck Info: File `DataFest-Write-Up.out' has not changed.
 (rerunfilecheck)             Checksum: D41D8CD98F00B204E9800998ECF8427E;0.
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 149.
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 187.
  ) 
 Here is how much of TeX's memory you used:
- 10891 strings out of 482426
- 156139 string characters out of 5946528
- 405318 words of memory out of 5000000
- 26471 multiletter control sequences out of 15000+600000
+ 10884 strings out of 482426
+ 155748 string characters out of 5946527
+ 410108 words of memory out of 5000000
+ 26466 multiletter control sequences out of 15000+600000
  574454 words of font info for 61 fonts, out of 8000000 for 9000
  14 hyphenation exceptions out of 8191
- 34i,6n,37p,911b,317s stack positions out of 5000i,500n,10000p,200000b,80000s
-{c:/Users/headg/AppData/Roaming/TinyTeX/texmf-dist/fonts/enc/dvips/lm/lm-rm.e
-nc}{c:/Users/headg/AppData/Roaming/TinyTeX/texmf-dist/fonts/enc/dvips/lm/lm-mat
-hit.enc}{c:/Users/headg/AppData/Roaming/TinyTeX/texmf-dist/fonts/enc/dvips/lm/l
-m-ec.enc}<c:/Users/headg/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/
-lm/lmbx10.pfb><c:/Users/headg/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/pu
-blic/lm/lmmi10.pfb><c:/Users/headg/AppData/Roaming/TinyTeX/texmf-dist/fonts/typ
-e1/public/lm/lmr10.pfb><c:/Users/headg/AppData/Roaming/TinyTeX/texmf-dist/fonts
-/type1/public/lm/lmr12.pfb><c:/Users/headg/AppData/Roaming/TinyTeX/texmf-dist/f
-onts/type1/public/lm/lmr17.pfb>
-Output written on DataFest-Write-Up.pdf (2 pages, 623513 bytes).
+ 34i,7n,37p,911b,317s stack positions out of 5000i,500n,10000p,200000b,80000s
+{c:/Users/headg/AppData/Roaming/TinyTeX/texmf-dist/fonts/enc/dvips/lm/lm-math
+sy.enc}{c:/Users/headg/AppData/Roaming/TinyTeX/texmf-dist/fonts/enc/dvips/lm/lm
+-rm.enc}{c:/Users/headg/AppData/Roaming/TinyTeX/texmf-dist/fonts/enc/dvips/lm/l
+m-ec.enc}{c:/Users/headg/AppData/Roaming/TinyTeX/texmf-dist/fonts/enc/dvips/lm/
+lm-mathit.enc}<c:/Users/headg/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/pu
+blic/lm/lmbx10.pfb><c:/Users/headg/AppData/Roaming/TinyTeX/texmf-dist/fonts/typ
+e1/public/lm/lmmi10.pfb><c:/Users/headg/AppData/Roaming/TinyTeX/texmf-dist/font
+s/type1/public/lm/lmr10.pfb><c:/Users/headg/AppData/Roaming/TinyTeX/texmf-dist/
+fonts/type1/public/lm/lmr12.pfb><c:/Users/headg/AppData/Roaming/TinyTeX/texmf-d
+ist/fonts/type1/public/lm/lmr17.pfb><c:/Users/headg/AppData/Roaming/TinyTeX/tex
+mf-dist/fonts/type1/public/lm/lmsy10.pfb>
+Output written on DataFest-Write-Up.pdf (2 pages, 123881 bytes).
 PDF statistics:
- 50 PDF objects out of 1000 (max. 8388607)
+ 49 PDF objects out of 1000 (max. 8388607)
  38 compressed objects within 1 object stream
  4 named destinations out of 1000 (max. 500000)
- 6 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 1 words of extra memory for PDF output out of 10000 (max. 10000000)
 

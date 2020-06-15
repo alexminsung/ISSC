@@ -1,6 +1,6 @@
 ---
-title: "Writeup For DataFest"
-author: "Jonas"
+title: "Explore the change of characteristics in shelters influenced by COVID-19, specifically sector composition as well as occupancy rate "
+author: "Jonas Lee & Alex Kim"
 date: "13/06/2020"
 output: pdf_document
 ---
@@ -8,31 +8,30 @@ output: pdf_document
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
+$\underline{OverView:}$
+For our project we focused on exploring how COVID-19 influenced the change of characteristics within the GTA shelters. In particular we wanted to determine whether there was a change in the number of people using these shelters between March 17, 2020 and June 8, 2020, as well as not neglecting other important charactertics such as: gender compositions and the change in occupancy rate, pre and post March 17th..
 
-####The Statistically Analysis regarding the number of Occupants in GTA shelters during the COVID-19 lockdown
+$\underline{Summary of Statistics:}$
+To help us analyze this issue we first gathered the daily data about the shelters listed in the GTA, that are publicly available here: “https://open.toronto.ca/dataset/daily-shelter-occupancy/". Initially, we expected the occupancy numbers to increase as a result of the lockdown enforcement, as well as the financial constraints that may have made payments to residency difficult. A scatterplot comparing occupancy to capacity over time was made, and it was observed that contrary to initial expectation there was a downward trend of of occupancy rate over time. This lead to an investiagtion resulting with number of occupants decreasing over time with some shelters have significant decreases. Further research revealed, that certain dates had significant drops, which matched the dates of signficant outbreaks of COVID-19 in some shelters.This can be seen in the plots of the four orgnaizations with vertical lines.
 
-#$\underline{OverView}$
+Concluding the research, several models were created, inclduing a logitsitical binominal GLM to analyze proportions of sectors (e.g. shelters exclsuively for men, etc), but ultimately a poisson regressional model to measure the count of the number of occupants per characteristic from March 17 2020 to June 8 2020, best fit the data. 
 
+While we have concluded that this is the best fit model for the data, it is also important to note limitations such as: some shelters were over capacity, and that our variables were not independet, because our response variable was influenced by the results of previous days.
 
-$\bold{Jonas}$
+$\bold{01.01.2020}$ | $Co-ed$      | $Families$    | $Women$    | $Youth$ | $Capacity$ | $Etobicoke$   
+--------     | -------      | ----------    | -------    | ------- | ---------- | -----------   
+Estimate     |  0.73        |  1.48         | 0.66       |  0.70   |  1.00      |  0.30         
+p-value      | < 0.001      | < 0.001       | < 0.001    | < 0.001 | < 0.001    |  < 0.001
+$Output$     | $North York$ | $Scarborough$ | $Full Cap$ |$Cap:Eto$| $Cap:NY$   | $Cap:Scarb$  
+Estimate     |  0.06        | 0.71          |   0.99     |  1.034  |  1.08      | 1.01          
+p-value      | < 0.001      | < 0.001       |   0.12     | < 0.001 | < 0.001    | < 0.001        
+$\bold{02.17.2020}$ | $Co-ed$      | $Families$    | $Women$    | $Youth$ | $Capacity$ | $Etobicoke$   
+Estimate |  1.01        |  1.50         | 0.71       |  0.78   |  1.00      |  0.43         
+p-value  | < 0.001      | 0.25          | < 0.001    | < 0.001 | < 0.001    |  < 0.001        
+$Output$ | $North York$ | $Scarborough$ | $Full Cap$ |$Cap:Eto$| $Cap:NY$   | $Cap:Scarb$  
+Estimate |  0.09        | 1.00          |   1.09     |  1.02   |  0.17      | 1.00             
+p-value  | < 0.001      | 0.69          | < 0.001    | < 0.001 | < 0.001    | < 0.001        
 
-$\underline{hello}$
-
-For our project we decided to focus on the issue regarding whether there was a change in the number of people using the GTA shelters between March 17, 2020 and June 8, 2020.
-
-To help us analyze this issue we first gathered the daily data about the shelters listed in the GTA, that are publicaly avaibale here:"https://open.toronto.ca/dataset/daily-shelter-occupancy/". An appropiate possion regression model waas made to fit the data. And from the model we were able to determine that there was either an uniform or decrease in the number of people that stayed in the GTA shelters during the time period.
-
-
-#$\underline{Descriptive Summary Statistics Of Occupancy}$
-
-$Sector$ | $Mean$ | $Standard Deviation$ | $Q1$  | $Median$ | $Q3$  | $Min$ | $Max$  | $IQR$
--------- | ------ | -------------------- | ----- | -------- | ----- | ----- | ------ | -----
-Total    | 47.04  |  74.72               | 10.00 | 28.00    | 56.00 | 0.00  | 700.00 | 5
-Men      | 39.16  |  42.15               | 12.00 | 28.00    | 58.00 | 0.00  | 290.00 | 5
-Women    | 27.40  |  28.65               | 4.00  | 21.00    | 38.00 | 0.00  | 166.00 | 5
-Co-ed    | 39.52  |  36.44               | 10.00 | 33.00    | 70.00 | 0.00  | 178.00 | 5
-Families | 119.40 |  150.99              | 25.00 | 72.00    | 143.0 | 0.00  | 700.00 | 5
-Youth    | 24.44  |  18.57               | 11.00 | 22.00    | 32.00 | 0.00  | 95.00  | 5
 
 ```{r echo=FALSE, eval=TRUE, message=FALSE, results=FALSE}
 #summary statistics that covers (mean, median, min, max, and the three quantiles)
@@ -65,28 +64,26 @@ shelterData_families <- shelterData %>%
 shelterData_youth <- shelterData %>%
   filter(as.character(OCCUPANCY_DATE) > "2020-03-17T00:00:00" & as.character(SECTOR) == "Youth")
 
-print("Proportion of People that  stayed in shelters for Women:")
-womenshelter_proportion <- (sum(shelterData_men$OCCUPANCY) / sum(shelterData$OCCUPANCY))
+#Proportion of People that stayed in shelters for Women:
+womenshelter_proportion <- (sum(shelterData_wommen$OCCUPANCY) / sum(shelterData$OCCUPANCY))
 womenshelter_proportion
 
-print("Proportion of People that  stayed in shelters for Men:")
+#Proportion of People that  stayed in shelters for Men:
 menshelter_proportion <- (sum(shelterData_men$OCCUPANCY) / sum(shelterData$OCCUPANCY))
 menshelter_proportion
 
-print("Proportion of People that stayed in shelters for Youth:")
-youthnshelter_proportion <- (sum(shelterData_men$OCCUPANCY) / sum(shelterData$OCCUPANCY))
+#Proportion of People that stayed in shelters for Youth:
+youthnshelter_proportion <- (sum(shelterData_youth$OCCUPANCY) / sum(shelterData$OCCUPANCY))
 youthnshelter_proportion
 
-print("Proportiong of People that stayed in Co-ed shelters:")
-coedshelter_proportion <- (sum(shelterData_men$OCCUPANCY) / sum(shelterData$OCCUPANCY))
+#Proportiong of People that stayed in Co-ed shelters:
+coedshelter_proportion <- (sum(shelterData_coed$OCCUPANCY) / sum(shelterData$OCCUPANCY))
 coedshelter_proportion
 
-print("Proportion of People that stayed in shelters for Families:")
-Familyshelter_proportion <- (sum(shelterData_men$OCCUPANCY) / sum(shelterData$OCCUPANCY))
+#Proportion of People that stayed in shelters for Families:
+Familyshelter_proportion <- (sum(shelterData_families$OCCUPANCY) / sum(shelterData$OCCUPANCY))
 Familyshelter_proportion
 ```
-
-
 
 ####$\underline{Summarizing Statistical Test Outcomes:}$
 ```{r echo=FALSE, message=FALSE, results=FALSE}
@@ -125,19 +122,24 @@ summary(shelterModel3)
 lmtest::lrtest(shelterModel2, shelterModel3)
 ```
 
-```{r echo=FALSE}
-plot(shelterModel3$y)
+```{r echo=FALSE, results=FALSE}
+table <- data.frame(cbind(exp(logRate2), summary(shelterModel3)$coeff[ ,4]))
+names(table) <- c("est", "2.5%", "97.5%", "Pr(>|z|)")
+knitr::kable(table,digits=3)
+#plot(shelterModel3$y)
 ```
 
-For the purpose of our project we assumed a signifigance level $alpha$=0.05. From the plot it can be seen that the shelters had a decrease in the number of occupants using their shelter, or there were some slight dips but followed a unfiform distribution.
 
-#TRYING STUFF OUT:
+From the first table above which models pre-COVID-19 data (before March 17), we can see that majority of the clients in shelters are families, with males coming in second. This is likely because families come in at least pairs in numbers. 
+The second table which models data during the pandemic (March 17 and onwards) shows relatively similar results with families still being the most predominant groups of clients and males coming in second once again. However, it is possible to observe that there are more women and youth occupants now then before. We believe this emphasis is a result of the overall number of occupants being almost halved during the pandemic (as seen from the graphs above).
 
-Therefore in conclusion we can see that that there is a singificant drop in the number of occupants in the shelters as COVID-19 progressed. Additionally from the plot(shelterModel3$y) it can be seen that there is a downwards trend. Finally when computing the AIC model it can be seen that the same predictors are used, hence confirming that the predictors are statistically significant.
 
-This is where I show the model I use as well as the results from the model. It is also where I talk about the signifigance of the p-values and why they were used to justify their use for the model (maybe get rid of that part?), 
-comparing t-tests 
-ANOVA
-summarizing correlation and Regression Analyses
 
-POINT 331 MAY BE A LEVERAGE POINT (OR MAYBE AN INFLUENTIAL POINT)
+From a summary of our model between the times of March 17th and June 8th, it can be observed that the covariates: Co-ed, women, men youth, capacity, full capacity etobicoke, North york, capacity of shelters in etobicoke, capacity of shelters in North York and capacity of shelters in Scarborough being statistically significant. In particular it can be seen that the covariate Families influnces the response variable the most. This could possibly be attributed to the range of reasons that a family has for staying in a shelter are more diverse than ranges for any of the other sectors.
+
+
+
+From the gg-plot we noticed that there was a trend where shelters either approximately maintained a constant number of occupants in the shelters as time progressed, or had either a slight or significant decrease in the number of occupants in certain shelters or had certain dips in the number of reported occupants in shelters but was able to rally and proceed to approximately have a constant number of occupants. Particular we were able to identify drastic drops in the number of reported occupants in certain shelters, once a report on significant number of COVID-19 outbreaks occurred in other shelters in the GTA. Additionally notice that when the likelihood Ratio of Test Of Nested Models occurs, a p-value smaller than a 0.05 is obtained. This indicates the both our model is statistically significant, as well as allowing us to reject our null hypothesis. From the second slide it is possible to see that for the sector of women, there are bigger jumps between when the number of occupants were using shelter, in contrast to the men's slides where more of the shelters seem to have a more gradual decrease in the number of occupants.
+
+Therefore we were able to determine our answer to our question and answer confidently that not only was there a change in occupancy in the GTA shelters, it in fact decreased, contrary to our intial thoughts!
+
