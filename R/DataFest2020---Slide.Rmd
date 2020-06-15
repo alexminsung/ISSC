@@ -1,7 +1,7 @@
 ---
-title: "DataFest 2020 - How Will COVID-19 Affect the Occupancy in Temporary Shelters?"
+title: "DataFest 2020 - How Will COVID-19 Affect Temporary Shelters? (Exploring changes in occupancies and compositions)"
 author: Minsung Kim and Jonas Lee
-date: June 15, 2020
+date: June 14, 2020
 output: beamer_presentation
 keep_tex: yes
 header-includes:
@@ -45,14 +45,14 @@ shelterByCovid <- shelterData %>%
 # filters the data to include only Men and Women observations. Such measurements were taken because they made up most of the 
 # observations and also to better illustrate a trend.
 shelterData %>%
-  filter(as.character(SECTOR) == "Women" & as.character(OCCUPANCY_DATE) > "2020-03-17T00:00:00") %>%
+  filter(as.character(SECTOR) == "Women" & as.character(OCCUPANCY_DATE) >= "2020-03-17T00:00:00") %>%
   mutate(relaFreq = OCCUPANCY/CAPACITY) %>%
   ggplot(aes(x = OCCUPANCY_DATE, y = relaFreq, color = SHELTER_NAME)) + geom_point() + facet_wrap(SHELTER_CITY~ORGANIZATION_NAME) + theme(axis.text.x=element_blank(), axis.ticks.x=element_blank()) + 
   labs(title = "Shelters Occupancy to Capacity Percent by Organizations (Women)", x = "Occupancy Date", y = "Relative Frequency", 
        colour = "Shelter Names")
   
 shelterData %>%
-  filter(as.character(SECTOR) == "Men" & as.character(OCCUPANCY_DATE) > "2020-03-17T00:00:00") %>%
+  filter(as.character(SECTOR) == "Men" & as.character(OCCUPANCY_DATE) >= "2020-03-17T00:00:00") %>%
   mutate(relaFreq = OCCUPANCY/CAPACITY) %>%
   ggplot(aes(x = OCCUPANCY_DATE, y = relaFreq, color = SHELTER_NAME)) + geom_point() + facet_wrap(SHELTER_CITY~ORGANIZATION_NAME) + theme(axis.text.x=element_blank(), axis.ticks.x=element_blank()) + 
   labs(title = "Shelters Occupancy to Capacity Percent by Organizations (Men)", x = "Occupancy Date", y = "Relative Frequency", colour = "Shelter Names")
@@ -87,7 +87,7 @@ importantDates <- c('2020-05-07T00:00:00', '2020-05-19T00:00:00', '2020-04-09T00
 
 # creates a graph to showcase the correlation in some of the shelters
 shelterByCovid %>%
-  filter(as.character(OCCUPANCY_DATE) > "2020-03-017T00:00:00") %>%
+  filter(as.character(OCCUPANCY_DATE) >= "2020-03-017T00:00:00") %>%
   mutate(relaFreq = OCCUPANCY/CAPACITY) %>%
   ggplot(aes(x = OCCUPANCY_DATE, y = OCCUPANCY, color = SHELTER_NAME)) + geom_point() + 
   facet_wrap(~ORGANIZATION_NAME) +
@@ -116,42 +116,12 @@ shelterByCovid %>%
   
 ## The Analysis
 
-  
-```{r echo = FALSE, results = FALSE}
-
-# dataset used for model
-shelterDataSub <- shelterData %>%
-  filter(as.character(OCCUPANCY_DATE) > "2020-03-17T00:00:00") 
-
-# removes all NaNs caused by zero capacity values 
-shelterDataSub <- shelterDataSub[!(shelterDataSub$CAPACITY == 0), ] 
-
-# model used for comparison with another model using Likelihood Test
-shelterModel2 <- glm(OCCUPANCY ~ SECTOR + CAPACITY + SHELTER_CITY, data = shelterDataSub, family = poisson(link = "log"))
-
-# manually assigning the baseline
-shelterDataSub$SECTOR <- factor(shelterDataSub$SECTOR, ordered = FALSE)
-shelterDataSub$SHELTER_CITY <- factor(shelterDataSub$SHELTER_CITY, ordered = FALSE)
-shelterDataSub$category <- relevel(shelterDataSub$SECTOR, 'Men')
-shelterDataSub$city <- relevel(shelterDataSub$SHELTER_CITY, 'Toronto')
-
-# model of interest
-shelterModel3 <- glm(OCCUPANCY ~ category + CAPACITY*city, data = shelterDataSub, family = poisson(link = "log"))
-logRate2 <- cbind(est=shelterModel3$coef, confint(shelterModel3, level=0.95))
-
-# creates a table including p-value 
-table <- data.frame(cbind(exp(logRate2), summary(shelterModel3)$coeff[ ,4]))
-names(table) <- c("est", "2.5%", "97.5%", "Pr(>|z|)")
-knitr::kable(table,digits=3)
-
-```
-
 \begin{itemize}
-    \item Our analysis through a poisson regression have shown that most shelters still had vacant rooms available even during            the lockdown
+    \item Our analysis through a poisson regression have shown that families are still the most predominant groups of clients.
     \begin{enumerate}
-     \item Supported by the downward trend in occupancy to capacity rate shown in the graphs 
+     \item This result is plausible because families usually visit in trios.
    \end{enumerate}
-   \item Unlike our initial thoughts, the results suggest that shelters generally experienced a drop in occupancy rather than an          increase during the pandemic
+   \item Unlike our initial thoughts, the graphs suggest that shelters have generally experienced a drop in occupancy rather             than an increase during the pandemic
   \end{itemize}
 
  
